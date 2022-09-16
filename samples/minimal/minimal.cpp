@@ -19,9 +19,6 @@
 // For compilers that support precompilation, includes "wx/wx.h".
 #include "wx/wxprec.h"
 
-#ifdef __BORLANDC__
-    #pragma hdrstop
-#endif
 
 // for all others, include the necessary headers (this file is usually all you
 // need because it includes almost all "standard" wxWidgets headers)
@@ -33,7 +30,7 @@
 // resources
 // ----------------------------------------------------------------------------
 
-// the application icon (under Windows and OS/2 it is in resources and even
+// the application icon (under Windows it is in resources and even
 // though we could still include the XPM here it would be unused)
 #ifndef wxHAS_IMAGES_IN_RESOURCES
     #include "../sample.xpm"
@@ -147,7 +144,7 @@ MyFrame::MyFrame(const wxString& title)
     // set the frame icon
     SetIcon(wxICON(sample));
 
-#if wxUSE_MENUS
+#if wxUSE_MENUBAR
     // create a menu bar
     wxMenu *fileMenu = new wxMenu;
 
@@ -164,7 +161,14 @@ MyFrame::MyFrame(const wxString& title)
 
     // ... and attach this menu bar to the frame
     SetMenuBar(menuBar);
-#endif // wxUSE_MENUS
+#else // !wxUSE_MENUBAR
+    // If menus are not available add a button to access the about box
+    wxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
+    wxButton* aboutBtn = new wxButton(this, wxID_ANY, "About...");
+    aboutBtn->Bind(wxEVT_BUTTON, &MyFrame::OnAbout, this);
+    sizer->Add(aboutBtn, wxSizerFlags().Center());
+    SetSizer(sizer);
+#endif // wxUSE_MENUBAR/!wxUSE_MENUBAR
 
 #if wxUSE_STATUSBAR
     // create a status bar just for fun (by default with 1 pane only)

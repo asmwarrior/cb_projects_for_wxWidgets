@@ -20,9 +20,6 @@
 // For compilers that support precompilation, includes "wx/wx.h".
 #include "wx/wxprec.h"
 
-#ifdef __BORLANDC__
-    #pragma hdrstop
-#endif
 
 #ifndef WX_PRECOMP
     #include "wx/wx.h"
@@ -112,10 +109,14 @@ wxBEGIN_EVENT_TABLE(MyCanvas, wxScrolledWindow)
     EVT_MENU_HIGHLIGHT(wxID_ABOUT, MyCanvas::OnMenuHighlight)
     EVT_MENU_HIGHLIGHT(MDI_REFRESH, MyCanvas::OnMenuHighlight)
     EVT_MENU_CLOSE(MyCanvas::OnMenuClose)
+
+    EVT_UPDATE_UI(MDI_DISABLED_FROM_CANVAS, MyCanvas::OnUpdateUIDisable)
 wxEND_EVENT_TABLE()
 
 wxBEGIN_EVENT_TABLE(MyChild::EventHandler, wxEvtHandler)
     EVT_MENU(MDI_REFRESH, MyChild::EventHandler::OnRefresh)
+
+    EVT_UPDATE_UI(MDI_DISABLED_FROM_CHILD, MyChild::OnUpdateUIDisable)
 wxEND_EVENT_TABLE()
 
 // ===========================================================================
@@ -216,14 +217,14 @@ MyFrame::MyFrame()
 #endif // wxUSE_ACCEL
 
     // connect it only now, after creating m_textWindow
-    Connect(wxEVT_SIZE, wxSizeEventHandler(MyFrame::OnSize));
+    Bind(wxEVT_SIZE, &MyFrame::OnSize, this);
 }
 
 MyFrame::~MyFrame()
 {
     // and disconnect it to prevent accessing already deleted m_textWindow in
     // the size event handler if it's called during destruction
-    Disconnect(wxEVT_SIZE, wxSizeEventHandler(MyFrame::OnSize));
+    Unbind(wxEVT_SIZE, &MyFrame::OnSize, this);
 
     // also prevent its use as log target
     delete wxLog::SetActiveTarget(NULL);
@@ -253,7 +254,7 @@ wxMenuBar *MyFrame::CreateMainMenubar()
 void MyFrame::OnClose(wxCloseEvent& event)
 {
     unsigned numChildren = MyChild::GetChildrenCount();
-    if ( event.CanVeto() && (numChildren > 0) )
+    if ( event.CanVeto() && (numChildren > 1) )
     {
         wxString msg;
         msg.Printf("%d windows still open, close anyhow?", numChildren);
@@ -359,9 +360,7 @@ void MyFrame::InitToolBar(wxToolBar* toolBar)
 // Define a constructor for my canvas
 MyCanvas::MyCanvas(wxFrame *parent, const wxPoint& pos, const wxSize& size)
         : wxScrolledWindow(parent, wxID_ANY, pos, size,
-                           wxSUNKEN_BORDER |
-                           wxNO_FULL_REPAINT_ON_RESIZE |
-                           wxVSCROLL | wxHSCROLL),
+                           wxSUNKEN_BORDER | wxVSCROLL | wxHSCROLL),
           MenuEventLogger("canvas", parent)
 
 {
@@ -436,6 +435,8 @@ void MyCanvas::OnMenu(wxContextMenuEvent& event)
 {
     wxMenu menu;
     menu.Append(MDI_REFRESH, "&Refresh picture");
+    menu.Append(MDI_DISABLED_FROM_CANVAS, "Item disabled by canvas");
+    menu.Append(MDI_DISABLED_FROM_CHILD, "Item disabled by child");
     PopupMenu(&menu, ScreenToClient(event.GetPosition()));
 }
 
@@ -478,6 +479,9 @@ MyChild::MyChild(wxMDIParentFrame *parent)
         menuChild->Append(MDI_CHANGE_SIZE, "Resize frame\tCtrl-S");
     }
 #if wxUSE_CLIPBOARD
+    menuChild->AppendSeparator();
+    menuChild->Append(MDI_DISABLED_FROM_CANVAS, "Item not disabled by canvas");
+    menuChild->Append(MDI_DISABLED_FROM_CHILD, "Item disabled by child");
     menuChild->AppendSeparator();
     menuChild->Append(wxID_PASTE, "Copy text from clipboard\tCtrl-V");
 #endif // wxUSE_CLIPBOARD

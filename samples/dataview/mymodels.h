@@ -8,6 +8,11 @@
 // Licence:     wxWindows licence
 /////////////////////////////////////////////////////////////////////////////
 
+#include "wx/hashmap.h"
+#include "wx/vector.h"
+
+WX_DECLARE_HASH_MAP(unsigned, wxString, wxIntegerHash, wxIntegerEqual,
+                    IntToStringMap);
 
 // ----------------------------------------------------------------------------
 // MyMusicTreeModelNode: a node inside MyMusicTreeModel
@@ -21,7 +26,7 @@ class MyMusicTreeModelNode
 public:
     MyMusicTreeModelNode( MyMusicTreeModelNode* parent,
                           const wxString &title, const wxString &artist,
-                          unsigned int year )
+                          int year )
     {
         m_parent = parent;
 
@@ -131,6 +136,7 @@ public:
     void AddToClassical( const wxString &title, const wxString &artist,
                          unsigned int year );
     void Delete( const wxDataViewItem &item );
+    void Clear();
 
     wxDataViewItem GetNinthItem() const
     {
@@ -143,19 +149,6 @@ public:
                  unsigned int column, bool ascending ) const wxOVERRIDE;
 
     // implementation of base class virtuals to define model
-
-    virtual unsigned int GetColumnCount() const wxOVERRIDE
-    {
-        return 6;
-    }
-
-    virtual wxString GetColumnType( unsigned int col ) const wxOVERRIDE
-    {
-        if (col == 2)
-            return wxT("long");
-
-        return wxT("string");
-    }
 
     virtual void GetValue( wxVariant &variant,
                            const wxDataViewItem &item, unsigned int col ) const wxOVERRIDE;
@@ -184,6 +177,17 @@ private:
 
 
 // ----------------------------------------------------------------------------
+// MyLongMusicTreeModel
+// ----------------------------------------------------------------------------
+
+class MyLongMusicTreeModel : public MyMusicTreeModel
+{
+public:
+    MyLongMusicTreeModel();
+};
+
+
+// ----------------------------------------------------------------------------
 // MyListModel
 // ----------------------------------------------------------------------------
 
@@ -192,15 +196,14 @@ class MyListModel: public wxDataViewVirtualListModel
 public:
     enum
     {
+        Col_ToggleIconText,
         Col_EditableText,
-        Col_IconText,
         Col_Date,
         Col_TextWithAttr,
-        Col_Custom,
-        Col_Max
+        Col_Custom
     };
 
-    MyListModel();
+    MyListModel(int modelFlags);
 
     // helper methods to change the model
 
@@ -212,19 +215,6 @@ public:
 
     // implementation of base class virtuals to define model
 
-    virtual unsigned int GetColumnCount() const wxOVERRIDE
-    {
-        return Col_Max;
-    }
-
-    virtual wxString GetColumnType( unsigned int col ) const wxOVERRIDE
-    {
-        if (col == Col_IconText)
-            return wxT("wxDataViewIconText");
-
-        return wxT("string");
-    }
-
     virtual void GetValueByRow( wxVariant &variant,
                                 unsigned int row, unsigned int col ) const wxOVERRIDE;
     virtual bool GetAttrByRow( unsigned int row, unsigned int col,
@@ -233,9 +223,11 @@ public:
                                 unsigned int row, unsigned int col ) wxOVERRIDE;
 
 private:
+    wxVector<bool>   m_toggleColValues;
     wxArrayString    m_textColValues;
     wxArrayString    m_iconColValues;
-    wxIcon           m_icon[2];
+    IntToStringMap   m_customColValues;
+    wxBitmapBundle   m_icon[2];
 };
 
 // ----------------------------------------------------------------------------
@@ -247,3 +239,62 @@ class MyListStoreDerivedModel : public wxDataViewListStore
 public:
     virtual bool IsEnabledByRow(unsigned int row, unsigned int col) const wxOVERRIDE;
 };
+
+// ----------------------------------------------------------------------------
+// MyListStoreHasValueModel
+// ----------------------------------------------------------------------------
+
+class MyListStoreHasValueModel : public MyListStoreDerivedModel
+{
+public:
+    virtual bool HasValue(const wxDataViewItem &item, unsigned int col) const wxOVERRIDE;
+};
+
+// ----------------------------------------------------------------------------
+// MyIndexListModel
+// ----------------------------------------------------------------------------
+
+class MyIndexListModel : public wxDataViewIndexListModel
+{
+public:
+    MyIndexListModel() { }
+
+    void Fill(const wxArrayString& strings)
+    {
+        m_strings = strings;
+
+        Reset(m_strings.size());
+    }
+
+    // Implement base class pure virtual methods.
+    unsigned GetCount() const wxOVERRIDE { return m_strings.size(); }
+    void GetValueByRow(wxVariant& val, unsigned row, unsigned) const wxOVERRIDE
+    {
+        val = m_strings[row];
+    }
+    bool SetValueByRow(const wxVariant&, unsigned, unsigned) wxOVERRIDE
+    {
+        return false;
+    }
+
+private:
+    wxArrayString m_strings;
+
+    wxDECLARE_NO_COPY_CLASS(MyIndexListModel);
+};
+
+enum ModelFlags
+{
+    MODEL_USE_TALL_ROWS = 1 << 0,
+    MODEL_KEEP_LOGO_SMALL = 1 << 1,
+    MODEL_USE_MULTI_LINE_TEXT = 1 << 2
+};
+
+inline wxSize GetIconSizeFromModelFlags(int modelFlags)
+{
+    wxSize size(16, 16);
+    if ( (modelFlags & MODEL_USE_TALL_ROWS) && !(modelFlags & MODEL_KEEP_LOGO_SMALL) )
+        size *= 2;
+
+    return size;
+}
