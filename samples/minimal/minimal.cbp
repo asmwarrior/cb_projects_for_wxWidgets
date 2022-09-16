@@ -14,18 +14,11 @@
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
-					<Add option="`$(WX_CONFIG) --cflags`" />
+					<Add option="`$(#WX_CONFIG) --cflags`" />
 				</Compiler>
 				<Linker>
-					<Add option="`$(WX_CONFIG) --libs base,core`" />
-					<Add directory="$(WXWIN)/lib/$(WXCFG)" />
+					<Add option="`$(#WX_CONFIG) --libs base,core`" />
 				</Linker>
-				<ExtraCommands>
-					<Add before="cmd /c echo $(WXWIN)\lib\$(WXCFG)" />
-				</ExtraCommands>
-				<Environment>
-					<Variable name="WX_CONFIG" value="wx-config --compiler=gcc --wxcfg=$(WXCFG)" />
-				</Environment>
 			</Target>
 			<Target title="win_bcc">
 				<Option output="bin/$(TARGET_NAME)/$(PROJECT_NAME)" prefix_auto="1" extension_auto="1" />
@@ -78,9 +71,6 @@
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="minimal.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
