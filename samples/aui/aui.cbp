@@ -16,25 +16,18 @@
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-O2" />
-					<Add option="`$(WX_CONFIG) --cflags`" />
+					<Add option="`$(#WX_CONFIG) --cflags`" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="`$(WX_CONFIG) --libs std,aui`" />
-					<Add directory="$(WXWIN)/lib/$(WXCFG)" />
+					<Add option="`$(#WX_CONFIG) --libs std,aui`" />
 				</Linker>
-				<Environment>
-					<Variable name="WX_CONFIG" value="wx-config --compiler=gcc --wxcfg=$(WXCFG)" />
-				</Environment>
 			</Target>
 		</Build>
 		<VirtualTargets>
 			<Add alias="All" targets="win_gcc;" />
 		</VirtualTargets>
 		<Unit filename="auidemo.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
