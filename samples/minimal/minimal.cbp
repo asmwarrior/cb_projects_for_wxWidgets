@@ -27,10 +27,10 @@
 				<Option compiler="bcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
-					<Add option="`$(WX_CONFIG) --cflags`" />
+					<Add option="`$(#WX_CONFIG) --cflags`" />
 				</Compiler>
 				<Linker>
-					<Add option="`$(WX_CONFIG) --libs base,core`" />
+					<Add option="`$(#WX_CONFIG) --libs base,core`" />
 				</Linker>
 				<ExtraCommands>
 					<Add before="cmd /c echo $(WXWIN)\lib\$(WXCFG)" />
@@ -46,10 +46,10 @@
 				<Option compiler="msvc10" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
-					<Add option="`$(WX_CONFIG) --cflags`" />
+					<Add option="`$(#WX_CONFIG) --cflags`" />
 				</Compiler>
 				<Linker>
-					<Add option="`$(WX_CONFIG) --libs base,core`" />
+					<Add option="`$(#WX_CONFIG) --libs base,core`" />
 				</Linker>
 				<ExtraCommands>
 					<Add before="cmd /c echo $(WXWIN)\lib\$(WXCFG)" />

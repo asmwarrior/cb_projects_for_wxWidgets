@@ -14,7 +14,7 @@
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
-					<Add option="`$(WX_CONFIG) --cflags`" />
+					<Add option="`$(#WX_CONFIG) --cflags`" />
 				</Compiler>
 				<Linker>
 					<Add option="`wx-config --libs std,aui`" />

@@ -14,10 +14,10 @@
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
-					<Add option="`$(WX_CONFIG) --cflags`" />
+					<Add option="`$(#WX_CONFIG) --cflags`" />
 				</Compiler>
 				<Linker>
-					<Add option="`$(WX_CONFIG) --libs std,gl`" />
+					<Add option="`$(#WX_CONFIG) --libs std,gl`" />
 				</Linker>
 			</Target>
 		</Build>

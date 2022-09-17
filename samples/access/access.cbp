@@ -15,11 +15,11 @@
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-O2" />
-					<Add option="`$(WX_CONFIG) --cflags`" />
+					<Add option="`$(#WX_CONFIG) --cflags`" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="`$(WX_CONFIG) --libs base,core`" />
+					<Add option="`$(#WX_CONFIG) --libs base,core`" />
 				</Linker>
 			</Target>
 		</Build>
