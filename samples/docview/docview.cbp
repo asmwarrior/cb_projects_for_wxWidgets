@@ -16,8 +16,11 @@
 				<Compiler>
 					<Add option="`$(#WX_CONFIG) --cflags`" />
 				</Compiler>
+				<ResourceCompiler>
+					<Add option="`$(#WX_CONFIG) --rcflags`" />
+				</ResourceCompiler>
 				<Linker>
-					<Add option="`$(#WX_CONFIG) --libs base,core,adv`" />
+					<Add option="`$(#WX_CONFIG) --libs base,core,adv,aui`" />
 				</Linker>
 			</Target>
 		</Build>
