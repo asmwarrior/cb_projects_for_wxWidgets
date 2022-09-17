@@ -20,6 +20,8 @@
 				</Compiler>
 				<Linker>
 					<Add option="`$(#WX_CONFIG) --libs std,gl`" />
+					<Add option="-lopengl32" />
+					<Add option="-lglu32" />
 				</Linker>
 			</Target>
 		</Build>
