@@ -106,5 +106,9 @@
 		<Project filename="xti/xti.cbp" />
 		<Project filename="flash/flash.cbp" />
 		<Project filename="mfc/mfc.cbp" />
+		<Project filename="archive/archive.cbp" />
+		<Project filename="secretstore/secretstore.cbp" />
+		<Project filename="taskbarbutton/taskbarbutton.cbp" />
+		<Project filename="webrequest/webrequest.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>
