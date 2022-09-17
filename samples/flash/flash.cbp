@@ -5,6 +5,7 @@
 		<Option title="flash" />
 		<Option execution_dir="./" />
 		<Option pch_mode="2" />
+		<Option default_target="win_gcc" />
 		<Option compiler="null" />
 		<Build>
 			<Target title="win_vc">

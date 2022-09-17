@@ -5,6 +5,7 @@
 		<Option title="nativdlg" />
 		<Option execution_dir="./" />
 		<Option pch_mode="2" />
+		<Option default_target="win_gcc" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="win_gcc">
