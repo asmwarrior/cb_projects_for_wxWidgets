@@ -23,7 +23,6 @@
 					<Add option="`$(#WX_CONFIG) --rcflags`" />
 				</ResourceCompiler>
 				<Linker>
-					<Add option="-s" />
 					<Add option="`$(#WX_CONFIG) --libs base,core,adv`" />
 				</Linker>
 			</Target>
