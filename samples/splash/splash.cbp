@@ -19,6 +19,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="`$(#WX_CONFIG) --libs std,media`" />
+					<Add option="-lwx_mswu_media-3.2" />
 				</Linker>
 			</Target>
 		</Build>
