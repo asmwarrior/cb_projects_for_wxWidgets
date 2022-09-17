@@ -28,9 +28,9 @@
 			<Add alias="All" targets="win_gcc;" />
 		</VirtualTargets>
 		<Unit filename="combo.cpp" />
-		<Unit filename="dropbuth.png" />
-		<Unit filename="dropbutn.png" />
-		<Unit filename="dropbutp.png" />
+		<Unit filename="dropbuth.svg" />
+		<Unit filename="dropbutn.svg" />
+		<Unit filename="dropbutp.svg" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
