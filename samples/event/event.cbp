@@ -24,10 +24,11 @@
 		<VirtualTargets>
 			<Add alias="All" targets="win_gcc;" />
 		</VirtualTargets>
+		<Unit filename="chessboard.cpp" />
+		<Unit filename="chessboard.h" />
 		<Unit filename="event.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Unit filename="gestures.cpp" />
+		<Unit filename="gestures.h" />
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
