@@ -46,9 +46,6 @@
 		<Unit filename="icons/text.bmp" />
 		<Unit filename="icons/text.xpm" />
 		<Unit filename="test2.bmp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

@@ -28,9 +28,6 @@
 		<Unit filename="bitmap2.bmp" />
 		<Unit filename="griddemo.cpp" />
 		<Unit filename="griddemo.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

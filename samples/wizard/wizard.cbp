@@ -27,9 +27,6 @@
 		<Unit filename="wizard.cpp" />
 		<Unit filename="wiztest.xpm" />
 		<Unit filename="wiztest2.xpm" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

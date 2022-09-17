@@ -32,9 +32,6 @@
 		</ResourceCompiler>
 		<Unit filename="cube/cube.cpp" />
 		<Unit filename="cube/cube.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

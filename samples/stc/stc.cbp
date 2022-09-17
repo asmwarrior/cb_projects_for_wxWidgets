@@ -30,9 +30,6 @@
 		<Unit filename="prefs.cpp" />
 		<Unit filename="prefs.h" />
 		<Unit filename="stctest.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

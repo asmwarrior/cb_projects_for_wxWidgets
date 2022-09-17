@@ -43,9 +43,6 @@
 		<Unit filename="notepad.xpm" />
 		<Unit filename="view.cpp" />
 		<Unit filename="view.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

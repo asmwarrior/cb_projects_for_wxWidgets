@@ -27,9 +27,6 @@
 		<Unit filename="folder.xpm" />
 		<Unit filename="printing.cpp" />
 		<Unit filename="printing.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

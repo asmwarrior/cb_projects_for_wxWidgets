@@ -26,9 +26,6 @@
 			<Add alias="All" targets="win_gcc;" />
 		</VirtualTargets>
 		<Unit filename="zip/zip.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

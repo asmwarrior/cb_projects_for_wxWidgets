@@ -27,9 +27,6 @@
 		<Unit filename="dialogs.cpp" />
 		<Unit filename="dialogs.h" />
 		<Unit filename="tip.xpm" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

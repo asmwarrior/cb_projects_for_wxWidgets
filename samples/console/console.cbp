@@ -31,9 +31,6 @@
 			<Add option="-DwxUSE_GUI=0" />
 		</Compiler>
 		<Unit filename="console.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

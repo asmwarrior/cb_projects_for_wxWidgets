@@ -47,9 +47,6 @@
 		<Unit filename="selection_panel.xpm" />
 		<Unit filename="square.xpm" />
 		<Unit filename="triangle.xpm" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

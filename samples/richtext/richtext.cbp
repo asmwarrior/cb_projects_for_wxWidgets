@@ -44,9 +44,6 @@
 		<Unit filename="bitmaps/undo.xpm" />
 		<Unit filename="bitmaps/zebra.xpm" />
 		<Unit filename="richtext.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

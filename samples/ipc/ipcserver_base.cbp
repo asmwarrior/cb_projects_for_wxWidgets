@@ -29,9 +29,6 @@
 		<Unit filename="connection.h" />
 		<Unit filename="ipcsetup.h" />
 		<Unit filename="server.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

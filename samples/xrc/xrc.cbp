@@ -64,9 +64,6 @@
 		<Unit filename="rc/wxbanner.gif" />
 		<Unit filename="xrcdemo.cpp" />
 		<Unit filename="xrcdemo.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

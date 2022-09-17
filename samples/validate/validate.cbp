@@ -26,9 +26,6 @@
 		</VirtualTargets>
 		<Unit filename="validate.cpp" />
 		<Unit filename="validate.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

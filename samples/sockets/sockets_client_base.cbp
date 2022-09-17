@@ -31,9 +31,6 @@
 			<Add directory="%WXWIN%/include" />
 		</ResourceCompiler>
 		<Unit filename="baseclient.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

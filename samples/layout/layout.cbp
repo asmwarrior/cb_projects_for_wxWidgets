@@ -26,9 +26,6 @@
 		</VirtualTargets>
 		<Unit filename="layout.cpp" />
 		<Unit filename="layout.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

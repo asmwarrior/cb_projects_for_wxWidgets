@@ -38,9 +38,6 @@
 		<Unit filename="treetest.cpp" />
 		<Unit filename="treetest.h" />
 		<Unit filename="unchecked.xpm" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

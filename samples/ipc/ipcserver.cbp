@@ -29,9 +29,6 @@
 		<Unit filename="ipcsetup.h" />
 		<Unit filename="server.cpp" />
 		<Unit filename="server.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

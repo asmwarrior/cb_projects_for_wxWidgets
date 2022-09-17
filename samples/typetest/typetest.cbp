@@ -26,9 +26,6 @@
 		</VirtualTargets>
 		<Unit filename="typetest.cpp" />
 		<Unit filename="typetest.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

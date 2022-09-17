@@ -26,9 +26,6 @@
 		</VirtualTargets>
 		<Unit filename="renddll.cpp" />
 		<Unit filename="render.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

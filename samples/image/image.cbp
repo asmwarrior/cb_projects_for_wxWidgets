@@ -59,9 +59,6 @@
 		<Unit filename="test.png" />
 		<Unit filename="test.xpm" />
 		<Unit filename="toucan.png" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

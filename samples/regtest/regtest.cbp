@@ -38,9 +38,6 @@
 		</Unit>
 		<Unit filename="value1.ico" />
 		<Unit filename="value2.ico" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

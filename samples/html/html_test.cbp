@@ -31,9 +31,6 @@
 		<Unit filename="test/pic.png" />
 		<Unit filename="test/pic2.bmp" />
 		<Unit filename="test/test.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

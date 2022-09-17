@@ -27,9 +27,6 @@
 		</VirtualTargets>
 		<Unit filename="about/about.cpp" />
 		<Unit filename="about/data/logo.png" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

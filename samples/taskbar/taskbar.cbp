@@ -27,9 +27,6 @@
 		<Unit filename="smile.xpm" />
 		<Unit filename="tbtest.cpp" />
 		<Unit filename="tbtest.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

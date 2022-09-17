@@ -26,9 +26,6 @@
 		</VirtualTargets>
 		<Unit filename="shaped.cpp" />
 		<Unit filename="star.png" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

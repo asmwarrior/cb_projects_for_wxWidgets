@@ -28,9 +28,6 @@
 		</VirtualTargets>
 		<Unit filename="my_dll.cpp" />
 		<Unit filename="my_dll.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

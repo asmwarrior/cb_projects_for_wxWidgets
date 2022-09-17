@@ -84,9 +84,6 @@
 		<Unit filename="toggle.cpp" />
 		<Unit filename="widgets.cpp" />
 		<Unit filename="widgets.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

@@ -29,9 +29,6 @@
 		</VirtualTargets>
 		<Unit filename="my_dll.h" />
 		<Unit filename="wx_exe.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

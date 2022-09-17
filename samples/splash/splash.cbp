@@ -27,9 +27,6 @@
 		<Unit filename="mobile.xpm" />
 		<Unit filename="splash.cpp" />
 		<Unit filename="splash.png" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

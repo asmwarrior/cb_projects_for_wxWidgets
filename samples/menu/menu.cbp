@@ -26,9 +26,6 @@
 		</VirtualTargets>
 		<Unit filename="copy.xpm" />
 		<Unit filename="menu.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

@@ -25,9 +25,6 @@
 			<Add alias="All" targets="win_gcc;" />
 		</VirtualTargets>
 		<Unit filename="internat.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

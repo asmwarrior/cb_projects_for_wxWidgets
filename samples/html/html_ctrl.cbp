@@ -27,9 +27,6 @@
 			<Add alias="All" targets="gcc;" />
 		</VirtualTargets>
 		<Unit filename="htmlctrl/htmlctrl.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

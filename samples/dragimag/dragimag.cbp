@@ -39,9 +39,6 @@
 		<Unit filename="shape01.png" />
 		<Unit filename="shape02.png" />
 		<Unit filename="shape03.png" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

@@ -39,9 +39,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="penguin/trackball.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

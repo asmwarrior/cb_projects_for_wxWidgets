@@ -27,9 +27,6 @@
 		</VirtualTargets>
 		<Unit filename="printing/logo6.gif" />
 		<Unit filename="printing/printing.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

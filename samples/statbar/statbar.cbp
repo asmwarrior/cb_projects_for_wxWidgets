@@ -27,9 +27,6 @@
 		<Unit filename="green.xpm" />
 		<Unit filename="red.xpm" />
 		<Unit filename="statbar.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

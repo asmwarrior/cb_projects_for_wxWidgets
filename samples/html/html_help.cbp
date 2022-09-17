@@ -33,9 +33,6 @@
 		<Unit filename="test/imagemap.png" />
 		<Unit filename="test/pic.png" />
 		<Unit filename="test/pic2.bmp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

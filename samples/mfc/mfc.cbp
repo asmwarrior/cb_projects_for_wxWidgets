@@ -42,9 +42,6 @@
 		</Unit>
 		<Unit filename="resource.h" />
 		<Unit filename="stdafx.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
