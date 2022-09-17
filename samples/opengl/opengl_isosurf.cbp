@@ -20,9 +20,6 @@
 				<Linker>
 					<Add option="`$(WX_CONFIG) --libs std,gl`" />
 				</Linker>
-				<Environment>
-					<Variable name="WX_CONFIG" value="wx-config --compiler=gcc --wxcfg=$(WXCFG)" />
-				</Environment>
 			</Target>
 		</Build>
 		<VirtualTargets>

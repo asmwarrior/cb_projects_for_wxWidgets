@@ -20,9 +20,6 @@
 					<Add option="`$(WX_CONFIG) --libs base,core,adv`" />
 					<Add directory="$(WXWIN)/lib/$(WXCFG)" />
 				</Linker>
-				<Environment>
-					<Variable name="WX_CONFIG" value="wx-config --compiler=gcc --wxcfg=$(WXCFG)" />
-				</Environment>
 			</Target>
 		</Build>
 		<Compiler>

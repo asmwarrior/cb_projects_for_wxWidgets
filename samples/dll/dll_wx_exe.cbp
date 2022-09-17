@@ -22,9 +22,6 @@
 					<Add library="my_dll" />
 					<Add directory="bin/$(TARGET_NAME)" />
 				</Linker>
-				<Environment>
-					<Variable name="WX_CONFIG" value="wx-config --compiler=gcc --wxcfg=$(WXCFG)" />
-				</Environment>
 			</Target>
 		</Build>
 		<VirtualTargets>
