@@ -16,7 +16,7 @@
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
-					<Add option="-O2" />
+					<Add option="-g" />
 					<Add option="`$(#WX_CONFIG) --cflags`" />
 				</Compiler>
 				<ResourceCompiler>
