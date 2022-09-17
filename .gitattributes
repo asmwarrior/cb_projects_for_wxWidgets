@@ -1,0 +1,4 @@
+# Custom for CodeBlocks. These files are checked out using LF locally
+*.cbp       text eol=lf
+*.workspace text eol=lf
+*.wxs       text eol=lf
