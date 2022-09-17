@@ -31,7 +31,6 @@
 				</Compiler>
 				<Linker>
 					<Add option="`$(WX_CONFIG) --libs base,core`" />
-					<Add directory="$(WXWIN)/lib/$(WXCFG)" />
 				</Linker>
 				<ExtraCommands>
 					<Add before="cmd /c echo $(WXWIN)\lib\$(WXCFG)" />
@@ -51,7 +50,6 @@
 				</Compiler>
 				<Linker>
 					<Add option="`$(WX_CONFIG) --libs base,core`" />
-					<Add directory="$(WXWIN)/lib/$(WXCFG)" />
 				</Linker>
 				<ExtraCommands>
 					<Add before="cmd /c echo $(WXWIN)\lib\$(WXCFG)" />

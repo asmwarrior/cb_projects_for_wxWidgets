@@ -21,7 +21,6 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="`$(WX_CONFIG) --libs base,core,adv`" />
-					<Add directory="$(WXWIN)/lib/$(WXCFG)" />
 				</Linker>
 			</Target>
 		</Build>

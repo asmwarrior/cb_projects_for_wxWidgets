@@ -19,7 +19,6 @@
 				</Compiler>
 				<Linker>
 					<Add option="`$(WX_CONFIG) --libs base,net,core,adv,html`" />
-					<Add directory="$(WXWIN)/lib/$(WXCFG)" />
 				</Linker>
 			</Target>
 		</Build>
