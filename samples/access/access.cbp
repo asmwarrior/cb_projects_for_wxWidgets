@@ -19,7 +19,6 @@
 					<Add option="`$(#WX_CONFIG) --cflags`" />
 				</Compiler>
 				<Linker>
-					<Add option="-s" />
 					<Add option="`$(#WX_CONFIG) --libs base,core`" />
 				</Linker>
 			</Target>
