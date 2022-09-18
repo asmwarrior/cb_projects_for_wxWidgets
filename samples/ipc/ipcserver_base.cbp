@@ -13,7 +13,6 @@
 				<Option object_output=".objs/$(TARGET_NAME)" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option use_console_runner="0" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="`$(#WX_CONFIG) --cflags`" />
