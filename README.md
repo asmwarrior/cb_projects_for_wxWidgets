@@ -12,6 +12,17 @@ A tool named `wx-config-msys2.exe` is needed(you can put it in PATH environment)
 
 For discussion, you can see here: [codeblocks cbp projects for wx samples](https://forums.codeblocks.org/index.php/topic,25105.0.html).
 
+You have to set a global variable named "WX_CONFIG" in the Code::Blocks' setting "Global Variable Editor" dialog, see below:
+
+![Global Variable Editor](set-global-variable.png)
+
+The value of the "WX_CONFIG" could be something like below:
+
+~~~~
+wx-config-msys2.exe --prefix=$(TARGET_COMPILER_DIR)
+~~~~
+
+
 stahta01's old readme content
 ==========================
 Code::Blocks projects for building wxWidgets sample code
