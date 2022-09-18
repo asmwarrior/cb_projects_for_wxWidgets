@@ -18,7 +18,7 @@
 					<Add option="`$(#WX_CONFIG) --cflags`" />
 				</Compiler>
 				<Linker>
-					<Add option="`wx-config --libs std,aui`" />
+					<Add option="`$(#WX_CONFIG) --libs std,aui`" />
 				</Linker>
 			</Target>
 		</Build>
