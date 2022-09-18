@@ -18,6 +18,9 @@
 					<Add option="-g" />
 					<Add option="`$(#WX_CONFIG) --cflags`" />
 				</Compiler>
+				<ResourceCompiler>
+					<Add option="`$(#WX_CONFIG) --rcflags`" />
+				</ResourceCompiler>
 				<Linker>
 					<Add option="`$(#WX_CONFIG) --libs base,core,adv`" />
 				</Linker>
@@ -26,6 +29,9 @@
 		<VirtualTargets>
 			<Add alias="All" targets="win_gcc;" />
 		</VirtualTargets>
+		<Unit filename="../sample.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
 		<Unit filename="erase.cpp" />
 		<Extensions />
 	</Project>
