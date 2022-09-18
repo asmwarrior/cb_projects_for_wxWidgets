@@ -20,6 +20,9 @@
 				</Compiler>
 				<Linker>
 					<Add option="`$(#WX_CONFIG) --libs base,core`" />
+					<Add option="-lole32" />
+					<Add option="-loleaut32" />
+					<Add option="-loleacc" />
 				</Linker>
 			</Target>
 		</Build>
