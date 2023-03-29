@@ -975,7 +975,35 @@ void MyFrame::DoChangeFont(const wxFont& font, const wxColour& col)
 {
     m_fontWindow->UpdateFont(font, col);
 
+#ifdef __WXMSW__
+    // enable the smooth font on Windows by default
+    // font rendering issue when using C::B under windows remote desktop
+    // https://forums.codeblocks.org/index.php/topic,25146.msg171484.html#msg171484
+
+    wxFont fontWithClearType = font;
+    wxString nativeDesc = fontWithClearType.GetNativeFontInfoDesc();
+    int index = 0;
+    for (size_t pos = 0, start = 0; pos <= nativeDesc.length(); )
+    {
+        pos = nativeDesc.find(";", start);
+        index++;
+
+        if (index == 14)
+        {
+            // enable the cleartype option of the font
+            nativeDesc.replace(start, pos - start, "5");
+            bool result = fontWithClearType.SetNativeFontInfo(nativeDesc);
+            break;
+        }
+        start = pos+1;
+    }
+
+    m_textctrl->SetFont(fontWithClearType);
+#else
     m_textctrl->SetFont(font);
+#endif // __WXMSW__
+
+
     if ( col.IsOk() )
         m_textctrl->SetForegroundColour(col);
     m_textctrl->Refresh();
