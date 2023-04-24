@@ -91,6 +91,7 @@
 		<Project filename="opengl/opengl_cube.cbp" />
 		<Project filename="opengl/opengl_isosurf.cbp" />
 		<Project filename="opengl/opengl_penguin.cbp" />
+		<Project filename="opengl/opengl_pyramid.cbp" />
 		<Project filename="propgrid/propgrid.cbp" />
 		<Project filename="ribbon/ribbon.cbp" />
 		<Project filename="richtext/richtext.cbp" />
