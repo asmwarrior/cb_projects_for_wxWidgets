@@ -593,5 +593,18 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
             Refresh(false);
         }
     }
+    else if ( event.GetWheelRotation() )
+    {
+#if wxUSE_LOGWINDOW
+        wxString message = wxString::Format("%s wheel rotation %+d",
+            event.GetWheelAxis() == wxMOUSE_WHEEL_VERTICAL ? "Vertical" : "Horizontal",
+            event.GetWheelRotation());
+        wxLogMessage(message);
+#endif // wxUSE_LOGWINDOW
+
+        // mouse wheel, to change the fov
+        m_oglManager->OnMouseWheel( event.GetWheelRotation() );
+        Refresh(false);
+    }
 }
 

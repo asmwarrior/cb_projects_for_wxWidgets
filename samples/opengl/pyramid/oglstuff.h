@@ -257,6 +257,9 @@ public:
     void MouseRotation(int fromX, int fromY, int toX, int toY);
     double GetTrackballZ(double x, double y, double r);
 
+    // when mouse wheel, we just change the fov angle
+    void MouseWheel(int wheel);
+
     // The used matrices
     double m_dMode[16]; // The model matrix, rotation in this sample
     double m_dView[16]; // The view matrix
@@ -318,6 +321,7 @@ public:
     // Action events in OpenGL win coordinates (bottom is y=0)
     void OnMouseButDown(int posX, int posY);
     void OnMouseRotDragging(int posX, int posY);
+    void OnMouseWheel(int wheel);
 
 private:
     // Members

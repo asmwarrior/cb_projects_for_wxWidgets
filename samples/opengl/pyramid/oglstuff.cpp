@@ -1092,6 +1092,23 @@ double myOGLCamera::GetTrackballZ(double x, double y, double r)
     return  (d < r2/2.0) ? sqrt(r2 - d) : r2/2.0/sqrt(d);
 }
 
+void myOGLCamera::MouseWheel(int wheel)
+{
+    // update the m_fov
+    // From degrees to radians
+    const double degToRad = (double) 4.0 * atan(1.0) / 180.0;
+    // Angle of the field of view
+    // the original m_fov = 40.0 * degToRad; //radians
+    m_fov += wheel/120.0 * degToRad;
+
+    // Calculate the projection matrix
+    double aspect = (double) m_winWidth / m_winHeight;
+    MyPerspective(m_fov, aspect, m_nearD, m_farD, m_dProj);
+
+    // Inform we need to calculate MVP matrix
+    m_needMVPUpdate = true;
+}
+
 
 // ----------------------------------------------------------------------------
 // myOGLManager
@@ -1260,4 +1277,9 @@ void myOGLManager::OnMouseRotDragging(int posX, int posY)
     m_Camera.MouseRotation(m_mousePrevX, m_mousePrevY, posX, posY);
     m_mousePrevX = posX;
     m_mousePrevY = posY;
+}
+
+void myOGLManager::OnMouseWheel(int wheel)
+{
+    m_Camera.MouseWheel(wheel);
 }
