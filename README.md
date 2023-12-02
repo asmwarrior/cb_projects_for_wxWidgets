@@ -18,8 +18,17 @@ You have to set a global variable named "WX_CONFIG" in the Code::Blocks' setting
 
 The value of the "WX_CONFIG" could be something like below:
 
+If you are using the pre-build wxWidgets library from msys2 project, such as you install the library by the command line `pacman -S mingw-w64-x86_64-wxwidgets3.2-msw`. (See: [Package: mingw-w64-x86_64-wxwidgets3.2-msw - MSYS2 Packages](https://packages.msys2.org/package/mingw-w64-x86_64-wxwidgets3.2-msw?repo=mingw64))
 ~~~~
 wx-config-msys2.exe --prefix=$(TARGET_COMPILER_DIR)
+~~~~
+If you are using the wxWidgets library build yourself, such as the build command is like: `mingw32-make -j4 -f makefile.gcc SHARED=1 MONOLITHIC=1 BUILD=release UNICODE=1`, then the `WX_CONFIG` could be defined as:
+~~~~
+wx-config.exe --prefix=F:/code/wxWidgets-3.2.4 --wxcfg=gcc_dll/mswu
+~~~~
+If you have debug option enabled, such as `mingw32-make -j4 -f makefile.gcc SHARED=1 MONOLITHIC=1 BUILD=debug UNICODE=1`, you may need to define the `WX_CONFIG` like below:
+~~~~
+wx-config.exe --prefix=E:/code/wxWidgets-3.2.4 --wxcfg=gcc_dll/mswud --debug
 ~~~~
 
 
