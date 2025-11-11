@@ -1,6 +1,8 @@
 cb_projects_for_wxWidgets
 =========================
 
+2025-11-11 I have updated the samples code to the wxWidgets 3.3.1.
+
 2022-09-17 added by asmwarrior:
 
 This git repo is a fork from [stahta01/cb_projects_for_wxWidgets](https://github.com/stahta01/cb_projects_for_wxWidgets)
