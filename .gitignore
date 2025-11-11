@@ -38,3 +38,6 @@ makefile.wat
 
 # the clangd index files
 **/.cache/
+
+# the clangd plugin generated json file
+**/compile_commands.json
