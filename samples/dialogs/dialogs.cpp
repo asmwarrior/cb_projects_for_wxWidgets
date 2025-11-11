@@ -60,7 +60,7 @@
 #endif // wxUSE_TIPWINDOW
 
 #if wxUSE_PROGRESSDLG
-#if wxUSE_STOPWATCH && wxUSE_LONGLONG
+#if wxUSE_STOPWATCH
     #include "wx/datetime.h"      // wxDateTime
 #endif
 
@@ -166,7 +166,6 @@ wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)
 #endif // wxUSE_LOG_DIALOG
 #if wxUSE_INFOBAR
     EVT_MENU(DIALOGS_INFOBAR_SIMPLE,                MyFrame::InfoBarSimple)
-    EVT_MENU(DIALOGS_INFOBAR_SIMPLE_WRAPPED,        MyFrame::InfoBarSimpleWrapped)
     EVT_MENU(DIALOGS_INFOBAR_ADVANCED,              MyFrame::InfoBarAdvanced)
 #endif // wxUSE_INFOBAR
 
@@ -370,7 +369,7 @@ bool MyApp::OnInit()
                             "Progress in progress",
                             "Please wait, starting...",
                             PROGRESS_COUNT,
-                            NULL,
+                            nullptr,
                             m_startupProgressStyle
                          );
         for ( int i = 0; i <= PROGRESS_COUNT; i++ )
@@ -433,7 +432,7 @@ bool MyApp::OnInit()
     #endif // wxUSE_COLOURDLG
 
     #if wxUSE_FONTDLG
-        choices_menu->Append(DIALOGS_CHOOSE_FONT, "Choose &font\tShift-Ctrl-N");
+        choices_menu->Append(DIALOGS_CHOOSE_FONT, "Choose &font\tShift-Ctrl-J");
     #endif // wxUSE_FONTDLG
 
     #if wxUSE_CHOICEDLG
@@ -580,7 +579,6 @@ bool MyApp::OnInit()
 
     #if wxUSE_INFOBAR
        info_menu->Append(DIALOGS_INFOBAR_SIMPLE, "Simple &info bar\tCtrl-I");
-       info_menu->Append(DIALOGS_INFOBAR_SIMPLE_WRAPPED, "Simple info bar with wrapped text");
        info_menu->Append(DIALOGS_INFOBAR_ADVANCED, "&Advanced info bar\tShift-Ctrl-I");
     #endif // wxUSE_INFOBAR
 
@@ -693,17 +691,17 @@ bool MyApp::OnInit()
 
 // My frame constructor
 MyFrame::MyFrame(const wxString& title)
-       : wxFrame(NULL, wxID_ANY, title), m_confirmExit(false)
+       : wxFrame(nullptr, wxID_ANY, title), m_confirmExit(false)
 {
     SetIcon(wxICON(sample));
 
 #if USE_MODAL_PRESENTATION
-    m_dialog = (MyModelessDialog *)NULL;
+    m_dialog = nullptr;
 #endif // USE_MODAL_PRESENTATION
 
 #if wxUSE_FINDREPLDLG
     m_dlgFind =
-    m_dlgReplace = NULL;
+    m_dlgReplace = nullptr;
 #endif
 
 #if wxUSE_COLOURDLG
@@ -723,7 +721,7 @@ MyFrame::MyFrame(const wxString& title)
 
 #if wxUSE_INFOBAR
     // an info bar can be created very simply and used without any extra effort
-    m_infoBarSimple = new wxInfoBar(this);
+    m_infoBarSimple = new wxInfoBar(this, wxID_ANY, wxINFOBAR_CHECKBOX);
 
     // or it can also be customized by
     m_infoBarAdvanced = new wxInfoBar(this);
@@ -766,7 +764,7 @@ MyFrame::MyFrame(const wxString& title)
 #endif // wxUSE_INFOBAR
 
 #if wxUSE_TIPWINDOW
-    m_tipWindow = NULL;
+    m_tipWindow = nullptr;
 #endif // wxUSE_TIPWINDOW
 
 #ifdef __WXMSW__
@@ -944,15 +942,45 @@ void MyFrame::LogDialog(wxCommandEvent& WXUNUSED(event))
 void MyFrame::InfoBarSimple(wxCommandEvent& WXUNUSED(event))
 {
     static int s_count = 0;
-    m_infoBarSimple->ShowMessage
-                     (
-                      wxString::Format("Message #%d in the info bar.", ++s_count)
-                     );
-}
+    static bool s_dontShowAgain = false;
 
-void MyFrame::InfoBarSimpleWrapped(wxCommandEvent &WXUNUSED(event))
-{
-    m_infoBarSimple->ShowMessage( "This is very very long message to try the label wrapping on the info bar" );
+    if (s_dontShowAgain)
+    {
+        wxMessageBox("You asked to not see this again. Remember?");
+        return;
+    }
+
+    wxString msg;
+    if ( ++s_count % 2 )
+    {
+        msg.Printf("Short message #%d in the info bar.", s_count);
+    }
+    else
+    {
+        msg.Printf("A very, very, very, very long message #%d showing what "
+                   "happens when a message is too long to fit in the info bar "
+                   "and has to be either wrapped or ellipsized because it's "
+                   "just too long to fit in the available space (unless "
+                   "you have a humongously wide monitor, in which case, "
+                   "congratulations, you've managed to break this test).",
+                   s_count);
+    }
+
+    m_infoBarSimple->ShowCheckBox(_("Do not show this again"), false);
+    m_infoBarSimple->ShowMessage(msg);
+    // intercept the close button being clicked
+    m_infoBarSimple->Bind(wxEVT_BUTTON,
+        [this](wxCommandEvent& WXUNUSED(event))
+        {
+            // dismiss the message and (if a generic control)
+            // see if the "don't show this again" checkbox
+            // was checked and handle that for next time
+            m_infoBarSimple->Dismiss();
+            if (m_infoBarSimple->IsCheckBoxChecked())
+            {
+                s_dontShowAgain = true;
+            };
+        }, wxID_CLOSE);
 }
 
 void MyFrame::InfoBarAdvanced(wxCommandEvent& WXUNUSED(event))
@@ -1318,6 +1346,8 @@ public:
         sizerBtns->Add(new wxButton(this, wxID_RESET, "&Reset all"),
                        wxSizerFlags().Border(wxLEFT));
     }
+    MyRearrangeDialog(const MyRearrangeDialog&) = delete;
+    MyRearrangeDialog& operator=(const MyRearrangeDialog&) = delete;
 
     // call this instead of ShowModal() to update order and labels array in
     // case the dialog was not cancelled
@@ -1409,7 +1439,6 @@ private:
     wxTextCtrl *m_text;
 
     wxDECLARE_EVENT_TABLE();
-    wxDECLARE_NO_COPY_CLASS(MyRearrangeDialog);
 };
 
 wxBEGIN_EVENT_TABLE(MyRearrangeDialog, wxRearrangeDialog)
@@ -1516,24 +1545,24 @@ void MyFrame::AddRemove(wxCommandEvent& WXUNUSED(event))
         {
         }
 
-        wxWindow* GetItemsCtrl() const wxOVERRIDE
+        wxWindow* GetItemsCtrl() const override
         {
             return m_lbox;
         }
 
-        bool CanAdd() const wxOVERRIDE
+        bool CanAdd() const override
         {
             // Restrict the maximal number of items to 10 just for testing.
             return m_lbox->GetCount() <= 10;
         }
 
-        bool CanRemove() const wxOVERRIDE
+        bool CanRemove() const override
         {
             // We must have a selected item in order to be able to delete it.
             return m_lbox->GetSelection() != wxNOT_FOUND;
         }
 
-        void OnAdd() wxOVERRIDE
+        void OnAdd() override
         {
             // A real program would use a wxDataViewCtrl or wxListCtrl and
             // allow editing the newly edited item in place, here we just use a
@@ -1542,7 +1571,7 @@ void MyFrame::AddRemove(wxCommandEvent& WXUNUSED(event))
             m_lbox->Append(wxString::Format("new item #%d", ++s_item));
         }
 
-        void OnRemove() wxOVERRIDE
+        void OnRemove() override
         {
             // Notice that we don't need to check if we have a valid selection,
             // we can be only called if CanRemove(), which already checks for
@@ -1731,9 +1760,11 @@ public:
         : m_dialog(&dialog)
     {
     }
+    MyCustomizeHook(const MyCustomizeHook&) = delete;
+    MyCustomizeHook& operator=(const MyCustomizeHook&) = delete;
 
     // Override pure virtual base class method to add our custom controls.
-    virtual void AddCustomControls(wxFileDialogCustomize& customizer) wxOVERRIDE
+    virtual void AddCustomControls(wxFileDialogCustomize& customizer) override
     {
         // Note: all the pointers created here cease to be valid once
         // ShowModal() returns, TransferDataFromCustomControls() is the latest
@@ -1751,7 +1782,7 @@ public:
     }
 
     // Override another method called whenever something changes in the dialog.
-    virtual void UpdateCustomControls() wxOVERRIDE
+    virtual void UpdateCustomControls() override
     {
         // Enable the button if and only if the checkbox is checked.
         m_btn->Enable(m_cb->GetValue());
@@ -1768,7 +1799,7 @@ public:
     }
 
     // And another one called when the dialog is accepted.
-    virtual void TransferDataFromCustomControls() wxOVERRIDE
+    virtual void TransferDataFromCustomControls() override
     {
         m_info.Printf("paper=%s (%s), enabled=%d, text=\"%s\"",
                       GetFileDialogPaperSize(m_choiceSize->GetSelection()),
@@ -1804,8 +1835,6 @@ private:
     wxFileDialogStaticText* m_label;
 
     wxString m_info;
-
-    wxDECLARE_NO_COPY_CLASS(MyCustomizeHook);
 };
 
 void MyFrame::FileOpen(wxCommandEvent& WXUNUSED(event) )
@@ -1919,16 +1948,12 @@ void MyFrame::FileOpen2(wxCommandEvent& WXUNUSED(event) )
 void MyFrame::FilesOpen(wxCommandEvent& WXUNUSED(event) )
 {
     wxString wildcards =
-#ifdef __WXMOTIF__
-                    "C++ files (*.cpp)|*.cpp";
-#else
                     wxString::Format
                     (
                         "All files (%s)|%s|C++ files (*.cpp;*.h)|*.cpp;*.h",
                         wxFileSelectorDefaultWildcardStr,
                         wxFileSelectorDefaultWildcardStr
                     );
-#endif
     wxFileDialog dialog(this, "Testing open multiple file dialog",
                         wxEmptyString, wxEmptyString, wildcards,
                         wxFD_OPEN|wxFD_MULTIPLE);
@@ -1962,16 +1987,12 @@ void MyFrame::FilesOpen(wxCommandEvent& WXUNUSED(event) )
 void MyFrame::FilesOpenWindowModal(wxCommandEvent& WXUNUSED(event) )
 {
     wxString wildcards =
-#ifdef __WXMOTIF__
-                    "C++ files (*.cpp)|*.cpp";
-#else
                     wxString::Format
                     (
                         "All files (%s)|%s|C++ files (*.cpp;*.h)|*.cpp;*.h",
                         wxFileSelectorDefaultWildcardStr,
                         wxFileSelectorDefaultWildcardStr
                     );
-#endif
     wxFileDialog* dialog = new wxFileDialog(this, "Testing open multiple file dialog",
                         wxEmptyString, wxEmptyString, wildcards,
                         wxFD_OPEN|wxFD_MULTIPLE);
@@ -2030,12 +2051,12 @@ void MyFrame::FileSave(wxCommandEvent& WXUNUSED(event) )
         {
         }
 
-        void AddCustomControls(wxFileDialogCustomize& customizer) wxOVERRIDE
+        void AddCustomControls(wxFileDialogCustomize& customizer) override
         {
             m_checkbox = customizer.AddCheckBox("Encrypt");
         }
 
-        void TransferDataFromCustomControls() wxOVERRIDE
+        void TransferDataFromCustomControls() override
         {
             m_encrypt = m_checkbox->GetValue();
         }
@@ -2302,12 +2323,12 @@ void MyFrame::ModelessDlg(wxCommandEvent& event)
     }
     else // hide
     {
-        // If m_dialog is NULL, then possibly the system
+        // If m_dialog is null, then possibly the system
         // didn't report the checked menu item status correctly.
         // It should be true just after the menu item was selected,
         // if there was no modeless dialog yet.
 
-        wxASSERT( m_dialog != NULL );
+        wxASSERT( m_dialog != nullptr );
         if (m_dialog)
             m_dialog->Hide();
     }
@@ -2367,7 +2388,7 @@ void MyFrame::ShowTip(wxCommandEvent& WXUNUSED(event))
 
     if ( s_index == (size_t)-1 )
     {
-        srand(time(NULL));
+        srand(time(nullptr));
 
         // this is completely bogus, we don't know how many lines are there
         // in the file, but who cares, it's a demo only...
@@ -2429,16 +2450,17 @@ public:
 #endif
         wxSizer * const sizerTop = new wxBoxSizer(wxVERTICAL);
 
-        wxSizer* sizerText = new wxStaticBoxSizer(wxVERTICAL, this, "Notification Texts");
+        wxStaticBoxSizer* sizerText = new wxStaticBoxSizer(wxVERTICAL, this, "Notification Texts");
+        wxStaticBox* const sizerTextBox = sizerText->GetStaticBox();
 
-        sizerText->Add(new wxStaticText(this, wxID_ANY, "&Title:"),
+        sizerText->Add(new wxStaticText(sizerTextBox, wxID_ANY, "&Title:"),
             wxSizerFlags());
-        m_textTitle = new wxTextCtrl(this, wxID_ANY, "Notification Title");
+        m_textTitle = new wxTextCtrl(sizerTextBox, wxID_ANY, "Notification Title");
         sizerText->Add(m_textTitle, wxSizerFlags().Expand());
 
-        sizerText->Add(new wxStaticText(this, wxID_ANY, "&Message:"),
+        sizerText->Add(new wxStaticText(sizerTextBox, wxID_ANY, "&Message:"),
             wxSizerFlags());
-        m_textMessage = new wxTextCtrl(this, wxID_ANY, "A message within the notification",
+        m_textMessage = new wxTextCtrl(sizerTextBox, wxID_ANY, "A message within the notification",
             wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
         m_textMessage->SetMinSize(wxSize(300, -1));
         sizerText->Add(m_textMessage, wxSizerFlags().Expand());
@@ -2476,13 +2498,14 @@ public:
         m_showTimeout->SetSelection(0);
         sizerTop->Add(m_showTimeout, wxSizerFlags().Expand().Border());
 
-        wxSizer* sizerActions = new wxStaticBoxSizer(wxVERTICAL, this, "Additional Actions");
+        wxStaticBoxSizer* sizerActions = new wxStaticBoxSizer(wxVERTICAL, this, "Additional Actions");
+        wxStaticBox* const sizerActionsBox = sizerActions->GetStaticBox();
 
-        m_actionList = new wxListBox(this, wxID_ANY);
+        m_actionList = new wxListBox(sizerActionsBox, wxID_ANY);
         sizerActions->Add(m_actionList, wxSizerFlags().Expand());
 
         wxSizer* sizerActionMod = new wxBoxSizer(wxHORIZONTAL);
-        sizerActionMod->Add(new wxStaticText(this, wxID_ANY, "ID:"), wxSizerFlags().Center());
+        sizerActionMod->Add(new wxStaticText(sizerActionsBox, wxID_ANY, "ID:"), wxSizerFlags().Center());
         const wxString actionIds[] =
         {
             "wxID_DELETE",
@@ -2490,19 +2513,19 @@ public:
             "wxID_OK",
             "wxID_CANCEL"
         };
-        m_actionChoice = new wxChoice(this, wxID_ANY,
+        m_actionChoice = new wxChoice(sizerActionsBox, wxID_ANY,
             wxDefaultPosition, wxDefaultSize,
             WXSIZEOF(actionIds), actionIds
             );
         m_actionChoice->SetSelection(0);
         sizerActionMod->Add(m_actionChoice);
-        sizerActionMod->Add(new wxStaticText(this, wxID_ANY, "Custom label:"), wxSizerFlags().Center());
-        m_actionCaption = new wxTextCtrl(this, wxID_ANY);
+        sizerActionMod->Add(new wxStaticText(sizerActionsBox, wxID_ANY, "Custom label:"), wxSizerFlags().Center());
+        m_actionCaption = new wxTextCtrl(sizerActionsBox, wxID_ANY);
         sizerActionMod->Add(m_actionCaption);
-        wxButton* actionAddBtn = new wxButton(this, wxID_ADD);
+        wxButton* actionAddBtn = new wxButton(sizerActionsBox, wxID_ADD);
         actionAddBtn->Bind(wxEVT_BUTTON, &TestNotificationMessageWindow::OnActionAddClicked, this);
         sizerActionMod->Add(actionAddBtn);
-        wxButton* actionRemoveBtn = new wxButton(this, wxID_REMOVE);
+        wxButton* actionRemoveBtn = new wxButton(sizerActionsBox, wxID_REMOVE);
         actionRemoveBtn->Bind(wxEVT_BUTTON, &TestNotificationMessageWindow::OnActionRemoveClicked, this);
         sizerActionMod->Add(actionRemoveBtn);
 
@@ -2510,26 +2533,27 @@ public:
 
         sizerTop->Add(sizerActions, wxSizerFlags().Expand().Border());
 
-        wxSizer* sizerSettings = new wxStaticBoxSizer(wxVERTICAL, this, "Notification Settings");
+        wxStaticBoxSizer* sizerSettings = new wxStaticBoxSizer(wxVERTICAL, this, "Notification Settings");
+        wxStaticBox* const sizerSettingsBox = sizerSettings->GetStaticBox();
 
 #ifdef wxHAS_NATIVE_NOTIFICATION_MESSAGE
-        m_useGeneric = new wxCheckBox(this, wxID_ANY, "Use &generic notifications");
+        m_useGeneric = new wxCheckBox(sizerSettingsBox, wxID_ANY, "Use &generic notifications");
         sizerSettings->Add(m_useGeneric);
 #endif
 
-        m_delayShow = new wxCheckBox(this, wxID_ANY, "&Delay show");
+        m_delayShow = new wxCheckBox(sizerSettingsBox, wxID_ANY, "&Delay show");
 #if defined(__WXOSX__)
         m_delayShow->SetValue(true);
 #endif
         sizerSettings->Add(m_delayShow);
 
-        m_handleEvents = new wxCheckBox(this, wxID_ANY, "&Handle events");
+        m_handleEvents = new wxCheckBox(sizerSettingsBox, wxID_ANY, "&Handle events");
         m_handleEvents->SetValue(true);
         sizerSettings->Add(m_handleEvents);
 
 #if defined(__WXMSW__) && wxUSE_TASKBARICON
-        m_taskbarIcon = NULL;
-        m_useTaskbar = new wxCheckBox(this, wxID_ANY, "Use persistent &taskbar icon");
+        m_taskbarIcon = nullptr;
+        m_useTaskbar = new wxCheckBox(sizerSettingsBox, wxID_ANY, "Use persistent &taskbar icon");
         m_useTaskbar->SetValue(false);
         sizerSettings->Add(m_useTaskbar);
 #endif
@@ -2554,6 +2578,15 @@ public:
 
         Bind(wxEVT_BUTTON, &TestNotificationMessageWindow::OnShowClicked, this, wxID_NEW);
         Bind(wxEVT_BUTTON, &TestNotificationMessageWindow::OnCloseClicked, this, wxID_CLOSE);
+    }
+
+    ~TestNotificationMessageWindow()
+    {
+#if defined(__WXMSW__) && wxUSE_TASKBARICON
+        // If the persistent taskbar icon has been created and is
+        // not deleted at the end, the application will never exit.
+        delete m_taskbarIcon;
+#endif
     }
 
 private:
@@ -2643,9 +2676,9 @@ private:
             else
             if ( m_taskbarIcon )
             {
-                wxNotificationMessage::UseTaskBarIcon(NULL);
+                wxNotificationMessage::UseTaskBarIcon(nullptr);
                 delete m_taskbarIcon;
-                m_taskbarIcon = NULL;
+                m_taskbarIcon = nullptr;
             }
 #endif
         }
@@ -2777,7 +2810,8 @@ private:
 
     void OnNotificationDismissed(wxCommandEvent& event)
     {
-        ShowStatus("Notification was dismissed");
+        // See wxNotificationMessage::DismissalReason for reason explanations.
+        ShowStatus(wxString::Format("Notification was dismissed (reason: %d)", event.GetInt()));
 
         Raise();
 
@@ -2838,7 +2872,7 @@ void MyFrame::OnShowTip(wxCommandEvent& WXUNUSED(event))
 
 void MyFrame::OnUpdateShowTipUI(wxUpdateUIEvent& event)
 {
-    event.Check(m_tipWindow != NULL);
+    event.Check(m_tipWindow != nullptr);
 }
 
 #endif // wxUSE_TIPWINDOW
@@ -3070,34 +3104,6 @@ wxBEGIN_EVENT_TABLE(TestDefaultActionDialog, wxDialog)
     EVT_TEXT_ENTER(wxID_ANY,                 TestDefaultActionDialog::OnTextEnter)
 wxEND_EVENT_TABLE()
 
-// TODO-C++11: We can't declare this class inside TestDefaultActionDialog
-//             itself when using C++98, so we have to do it here instead.
-namespace
-{
-
-// We have to define a new class in order to actually handle pressing
-// Enter, if we didn't do it, pressing it would still close the dialog.
-class EnterHandlingTextCtrl : public wxTextCtrl
-{
-public:
-    EnterHandlingTextCtrl(wxWindow* parent, int id, const wxString& value)
-        : wxTextCtrl(parent, id, value,
-                     wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER)
-    {
-        Bind(wxEVT_TEXT_ENTER, &EnterHandlingTextCtrl::OnEnter, this);
-
-        SetInitialSize(GetSizeFromTextSize(GetTextExtent(value).x));
-    }
-
-private:
-    void OnEnter(wxCommandEvent& WXUNUSED(event))
-    {
-        wxLogMessage("Enter pressed");
-    }
-};
-
-} // anonymous namespace
-
 TestDefaultActionDialog::TestDefaultActionDialog( wxWindow *parent ) :
   wxDialog( parent, -1, "Test default action" )
 {
@@ -3125,7 +3131,20 @@ TestDefaultActionDialog::TestDefaultActionDialog( wxWindow *parent ) :
     grid_sizer->Add(new wxStaticText(this, wxID_ANY, "wxTextCtrl without wxTE_PROCESS_ENTER"),
                     wxSizerFlags().CentreVertical());
 
-    grid_sizer->Add(new EnterHandlingTextCtrl(this, wxID_ANY, "Enter here is handled by the application"),
+    wxTextCtrl* textHandlingEnter =
+        new wxTextCtrl(this, wxID_ANY, "Enter here is handled by the application",
+                       wxDefaultPosition,
+                       wxSize(50*GetCharWidth(), -1), // big enough
+                       wxTE_PROCESS_ENTER);
+    textHandlingEnter->Bind(wxEVT_TEXT_ENTER,
+        [](wxCommandEvent& WXUNUSED(event))
+        {
+            wxLogMessage("Enter pressed");
+
+            // Don't skip the event here, otherwise the dialog would close.
+        }
+    );
+    grid_sizer->Add(textHandlingEnter,
                     wxSizerFlags().CentreVertical());
     grid_sizer->Add(new wxStaticText(this, wxID_ANY, "wxTextCtrl with wxTE_PROCESS_ENTER"),
                     wxSizerFlags().CentreVertical());
@@ -3195,14 +3214,14 @@ void MyFrame::OnModalHook(wxCommandEvent& event)
     class TestModalHook : public wxModalDialogHook
     {
     protected:
-        virtual int Enter(wxDialog* dialog) wxOVERRIDE
+        virtual int Enter(wxDialog* dialog) override
         {
             wxLogStatus("Showing %s modal dialog",
                         dialog->GetClassInfo()->GetClassName());
             return wxID_NONE;
         }
 
-        virtual void Exit(wxDialog* dialog) wxOVERRIDE
+        virtual void Exit(wxDialog* dialog) override
         {
             wxLogStatus("Leaving %s modal dialog",
                         dialog->GetClassInfo()->GetClassName());
@@ -3429,9 +3448,8 @@ static void InitAboutInfoMinimal(wxAboutDialogInfo& info)
                         wxMINOR_VERSION % 2 ? "Development" : "Stable",
                         wxVERSION_NUM_DOT_STRING
                     ));
-    info.SetDescription("This sample shows different wxWidgets dialogs");
-    info.SetCopyright("(C) 1998-2006 wxWidgets dev team");
-    info.AddDeveloper("Vadim Zeitlin");
+    info.SetDescription("This sample shows different wxWidgets dialogs.");
+    info.SetCopyright("Copyright (C) 1992-2025 wxWidgets dev team.");
 }
 
 static void InitAboutInfoWebsite(wxAboutDialogInfo& info)
@@ -3445,7 +3463,8 @@ static void InitAboutInfoAll(wxAboutDialogInfo& info)
 {
     InitAboutInfoWebsite(info);
 
-    // we can add a second developer
+    // we can add several developers one by one
+    info.AddDeveloper("Vadim Zeitlin");
     info.AddDeveloper("A.N. Other");
 
     // or we can add several persons at once like this
@@ -3454,6 +3473,7 @@ static void InitAboutInfoAll(wxAboutDialogInfo& info)
     docwriters.Add("Second One");
 
     info.SetDocWriters(docwriters);
+
     info.SetLicence(wxString::FromAscii(
 "                wxWindows Library Licence, Version 3.1\n"
 "                ======================================\n"
@@ -3506,11 +3526,13 @@ public:
     }
 
     // add some custom controls
-    virtual void DoAddCustomControls() wxOVERRIDE
+    virtual void DoAddCustomControls() override
     {
-        AddControl(new wxStaticLine(this), wxSizerFlags().Expand());
+        const auto parent = GetCustomControlParent();
+
+        AddControl(new wxStaticLine(parent), wxSizerFlags().Expand());
         AddText("Some custom text");
-        AddControl(new wxStaticLine(this), wxSizerFlags().Expand());
+        AddControl(new wxStaticLine(parent), wxSizerFlags().Expand());
     }
 };
 
@@ -3552,8 +3574,9 @@ void MyFrame::ShowRichBusyInfo(wxCommandEvent& WXUNUSED(event))
         (
             wxBusyInfoFlags()
                 .Parent(this)
-                .Icon(wxArtProvider::GetIcon(wxART_PRINT,
-                                             wxART_OTHER, wxSize(128, 128)))
+                .Icon(wxArtProvider::GetBitmapBundle(wxART_PRINT,
+                                                     wxART_OTHER,
+                                                     wxSize(128, 128)))
                 .Title("<b>Printing your document</b>")
                 .Text("Please wait...")
                 .Foreground(*wxWHITE)
@@ -3561,7 +3584,11 @@ void MyFrame::ShowRichBusyInfo(wxCommandEvent& WXUNUSED(event))
                 .Transparency(4*wxALPHA_OPAQUE/5)
         );
 
-    wxSleep(5);
+    for ( int i = 0; i < 20; i++ )
+    {
+        wxTheApp->Yield();
+        wxMilliSleep(250);
+    }
 }
 
 #endif // wxUSE_BUSYINFO
@@ -3574,7 +3601,7 @@ void MyFrame::ShowReplaceDialog( wxCommandEvent& WXUNUSED(event) )
     {
         m_dlgReplace->Destroy();
 
-        m_dlgReplace = NULL;
+        m_dlgReplace = nullptr;
     }
     else
     {
@@ -3596,7 +3623,7 @@ void MyFrame::ShowFindDialog( wxCommandEvent& WXUNUSED(event) )
     {
         m_dlgFind->Destroy();
 
-        m_dlgFind = NULL;
+        m_dlgFind = nullptr;
     }
     else
     {
@@ -3654,13 +3681,13 @@ void MyFrame::OnFindDialog(wxFindDialogEvent& event)
         {
             txt = "Find";
             idMenu = DIALOGS_FIND;
-            m_dlgFind = NULL;
+            m_dlgFind = nullptr;
         }
         else if ( dlg == m_dlgReplace )
         {
             txt = "Replace";
             idMenu = DIALOGS_REPLACE;
-            m_dlgReplace = NULL;
+            m_dlgReplace = nullptr;
         }
         else
         {
@@ -3802,7 +3829,7 @@ void MyModalDialog::OnButton(wxCommandEvent& event)
 StdButtonSizerDialog::StdButtonSizerDialog(wxWindow *parent)
     : wxDialog(parent, wxID_ANY, wxString("StdButtonSizer dialog"),
       wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER),
-      m_buttonsSizer(NULL)
+      m_buttonsSizer(nullptr)
 {
     wxBoxSizer *const sizerTop = new wxBoxSizer(wxVERTICAL);
 
@@ -3812,18 +3839,20 @@ StdButtonSizerDialog::StdButtonSizerDialog(wxWindow *parent)
     m_chkboxAffirmativeButton = new wxCheckBox(this, wxID_ANY, "Enable Affirmative Button");
 
     wxStaticBoxSizer *const sizer1 = new wxStaticBoxSizer(wxVERTICAL, this, "Affirmative Button");
+    wxStaticBox* const sizer1Box = sizer1->GetStaticBox();
 
-    m_radiobtnOk = new wxRadioButton(this, wxID_ANY, "Ok", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-    m_radiobtnYes = new wxRadioButton(this, wxID_ANY, "Yes");
+    m_radiobtnOk = new wxRadioButton(sizer1Box, wxID_ANY, "Ok", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+    m_radiobtnYes = new wxRadioButton(sizer1Box, wxID_ANY, "Yes");
 
     wxBoxSizer *const sizerInside2 = new wxBoxSizer(wxVERTICAL);
 
     m_chkboxDismissButton = new wxCheckBox(this, wxID_ANY, "Enable Dismiss Button");
 
     wxStaticBoxSizer *const sizer2 = new wxStaticBoxSizer(wxVERTICAL, this, "Dismiss Button");
+    wxStaticBox* const sizer2Box = sizer2->GetStaticBox();
 
-    m_radiobtnCancel = new wxRadioButton(this, wxID_ANY, "Cancel", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-    m_radiobtnClose = new wxRadioButton(this, wxID_ANY, "Close");
+    m_radiobtnCancel = new wxRadioButton(sizer2Box, wxID_ANY, "Cancel", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+    m_radiobtnClose = new wxRadioButton(sizer2Box, wxID_ANY, "Close");
 
     wxBoxSizer *const sizer3 = new wxBoxSizer(wxHORIZONTAL);
 
@@ -3839,7 +3868,7 @@ StdButtonSizerDialog::StdButtonSizerDialog(wxWindow *parent)
     sizer->Add(sizerInside1, 0, 0, 0);
     sizerInside1->Add(m_chkboxAffirmativeButton, 0, wxALL, 5);
     sizerInside1->Add(sizer1, 0, wxALL, 5);
-    sizerInside1->SetItemMinSize(sizer1, sizer1->GetStaticBox()->GetBestSize());    // to prevent wrapping of static box label
+    sizerInside1->SetItemMinSize(sizer1, sizer1Box->GetBestSize());    // to prevent wrapping of static box label
 
     sizer2->Add(m_radiobtnCancel, 0, wxALL, 5);
     sizer2->Add(m_radiobtnClose, 0, wxALL, 5);
@@ -3847,7 +3876,7 @@ StdButtonSizerDialog::StdButtonSizerDialog(wxWindow *parent)
     sizer->Add(sizerInside2, 0, 0, 0);
     sizerInside2->Add(m_chkboxDismissButton, 0, wxALL, 5);
     sizerInside2->Add(sizer2, 0, wxALL, 5);
-    sizerInside2->SetItemMinSize(sizer2, sizer2->GetStaticBox()->GetBestSize());    // to prevent wrapping of static box label
+    sizerInside2->SetItemMinSize(sizer2, sizer2Box->GetBestSize());    // to prevent wrapping of static box label
 
     sizerTop->Add(sizer, 0, wxALL, 5);
 
@@ -3878,19 +3907,16 @@ void StdButtonSizerDialog::OnEvent(wxCommandEvent& WXUNUSED(event))
     EnableDisableControls();
 
     long flags = 0;
-    unsigned long numButtons = 0;
 
     if (m_chkboxAffirmativeButton->IsChecked())
     {
         if (m_radiobtnOk->GetValue())
         {
             flags |= wxOK;
-            numButtons ++;
         }
         else if (m_radiobtnYes->GetValue())
         {
             flags |= wxYES;
-            numButtons ++;
         }
     }
 
@@ -3899,13 +3925,11 @@ void StdButtonSizerDialog::OnEvent(wxCommandEvent& WXUNUSED(event))
         if (m_radiobtnCancel->GetValue())
         {
             flags |= wxCANCEL;
-            numButtons ++;
         }
 
         else if (m_radiobtnClose->GetValue())
         {
             flags |= wxCLOSE;
-            numButtons ++;
         }
 
     }
@@ -3913,19 +3937,16 @@ void StdButtonSizerDialog::OnEvent(wxCommandEvent& WXUNUSED(event))
     if (m_chkboxApply->IsChecked())
     {
         flags |= wxAPPLY;
-        numButtons ++;
     }
 
     if (m_chkboxNo->IsChecked())
     {
         flags |= wxNO;
-        numButtons ++;
     }
 
     if (m_chkboxHelp->IsChecked())
     {
         flags |= wxHELP;
-        numButtons ++;
     }
 
     if (m_chkboxNoDefault->IsChecked())
@@ -4004,7 +4025,7 @@ SettingsDialog::SettingsDialog(wxWindow* win, SettingsData& settingsData, int di
             Add(wxArtProvider::GetIcon(wxART_ERROR, wxART_OTHER, imageSize));
     }
     else
-        m_imageList = NULL;
+        m_imageList = nullptr;
 
     Create(win, wxID_ANY, "Preferences", wxDefaultPosition, wxDefaultSize,
            wxDEFAULT_DIALOG_STYLE | resizeBorder);
@@ -4074,7 +4095,7 @@ wxPanel* SettingsDialog::CreateGeneralSettingsPage(wxWindow* parent)
     itemSizer8->Add(checkBox6, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     item0->Add(itemSizer8, 0, wxGROW|wxALL, 0);
 
-    topSizer->Add( item0, wxSizerFlags(1).Expand().Border(wxALL, 5) );
+    topSizer->Add( item0, wxSizerFlags(1).Expand().Border(wxALL) );
 
     panel->SetSizerAndFit(topSizer);
 
@@ -4104,17 +4125,17 @@ wxPanel* SettingsDialog::CreateAestheticSettingsPage(wxWindow* parent)
     wxArrayString backgroundStyleChoices;
     backgroundStyleChoices.Add("Colour");
     backgroundStyleChoices.Add("Image");
-    wxStaticBox* staticBox3 = new wxStaticBox(panel, wxID_ANY, "Background style:");
 
-    wxBoxSizer* styleSizer = new wxStaticBoxSizer( staticBox3, wxVERTICAL );
+    wxStaticBoxSizer* styleSizer = new wxStaticBoxSizer(wxVERTICAL, panel, "Background style:");
+    wxStaticBox* const styleSizerBox = styleSizer->GetStaticBox();
     item0->Add(styleSizer, 0, wxGROW|wxALL, 5);
 
     wxBoxSizer* itemSizer2 = new wxBoxSizer( wxHORIZONTAL );
 
-    wxChoice* choice2 = new wxChoice(panel, ID_BACKGROUND_STYLE, wxDefaultPosition, wxDefaultSize, backgroundStyleChoices);
+    wxChoice* choice2 = new wxChoice(styleSizerBox, ID_BACKGROUND_STYLE, wxDefaultPosition, wxDefaultSize, backgroundStyleChoices);
     choice2->SetValidator(wxGenericValidator(&m_settingsData.m_bgStyle));
 
-    itemSizer2->Add(new wxStaticText(panel, wxID_ANY, "&Window:"), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    itemSizer2->Add(new wxStaticText(styleSizerBox, wxID_ANY, "&Window:"), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     itemSizer2->Add(5, 5, 1, wxALL, 0);
     itemSizer2->Add(choice2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
 
@@ -4123,17 +4144,16 @@ wxPanel* SettingsDialog::CreateAestheticSettingsPage(wxWindow* parent)
 #if wxUSE_SPINCTRL
     //// FONT SIZE SELECTION
 
-    wxStaticBox* staticBox1 = new wxStaticBox(panel, wxID_ANY, "Tile font size:");
-    wxBoxSizer* itemSizer5 = new wxStaticBoxSizer( staticBox1, wxHORIZONTAL );
+    wxStaticBoxSizer* itemSizer5 = new wxStaticBoxSizer(wxHORIZONTAL, panel, "Tile font size:");
 
-    wxSpinCtrl* spinCtrl = new wxSpinCtrl(panel, ID_FONT_SIZE, wxEmptyString);
+    wxSpinCtrl* spinCtrl = new wxSpinCtrl(itemSizer5->GetStaticBox(), ID_FONT_SIZE, wxEmptyString);
     spinCtrl->SetValidator(wxGenericValidator(&m_settingsData.m_titleFontSize));
     itemSizer5->Add(spinCtrl, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 
     item0->Add(itemSizer5, 0, wxGROW|wxLEFT|wxRIGHT, 5);
 #endif
 
-    topSizer->Add( item0, wxSizerFlags(1).Expand().Border(wxALL, 5) );
+    topSizer->Add( item0, wxSizerFlags(1).Expand().Border(wxALL) );
     topSizer->AddSpacer(5);
 
     panel->SetSizerAndFit(topSizer);
@@ -4175,20 +4195,22 @@ bool TestMessageBoxDialog::Create()
     wxSizer * const sizerTop = new wxBoxSizer(wxVERTICAL);
 
     // this sizer allows to configure the messages shown in the message box
-    wxSizer * const
+    wxStaticBoxSizer * const
         sizerMsgs = new wxStaticBoxSizer(wxVERTICAL, this, "&Messages");
-    sizerMsgs->Add(new wxStaticText(this, wxID_ANY, "&Title:"));
-    m_textTitle = new wxTextCtrl(this, wxID_ANY, "Test Message Box");
+    wxStaticBox* const sizerMsgsBox = sizerMsgs->GetStaticBox();
+
+    sizerMsgs->Add(new wxStaticText(sizerMsgsBox, wxID_ANY, "&Title:"));
+    m_textTitle = new wxTextCtrl(sizerMsgsBox, wxID_ANY, "Test Message Box");
     sizerMsgs->Add(m_textTitle, wxSizerFlags().Expand().Border(wxBOTTOM));
 
-    sizerMsgs->Add(new wxStaticText(this, wxID_ANY, "&Main message:"));
-    m_textMsg = new wxTextCtrl(this, wxID_ANY, "Hello from a box!",
+    sizerMsgs->Add(new wxStaticText(sizerMsgsBox, wxID_ANY, "&Main message:"));
+    m_textMsg = new wxTextCtrl(sizerMsgsBox, wxID_ANY, "Hello from a box!",
                                wxDefaultPosition, wxDefaultSize,
                                wxTE_MULTILINE);
     sizerMsgs->Add(m_textMsg, wxSizerFlags(1).Expand().Border(wxBOTTOM));
 
-    sizerMsgs->Add(new wxStaticText(this, wxID_ANY, "&Extended message:"));
-    m_textExtMsg = new wxTextCtrl(this, wxID_ANY, "",
+    sizerMsgs->Add(new wxStaticText(sizerMsgsBox, wxID_ANY, "&Extended message:"));
+    m_textExtMsg = new wxTextCtrl(sizerMsgsBox, wxID_ANY, "",
                                   wxDefaultPosition, wxDefaultSize,
                                   wxTE_MULTILINE);
     sizerMsgs->Add(m_textExtMsg, wxSizerFlags().Expand());
@@ -4199,29 +4221,30 @@ bool TestMessageBoxDialog::Create()
     AddAdditionalTextOptions(sizerTop);
 
     // this one is for configuring the buttons
-    wxSizer * const
-    sizerBtnsBox = new wxStaticBoxSizer(wxVERTICAL, this, "&Buttons");
+    wxStaticBoxSizer * const
+    sizerBtns = new wxStaticBoxSizer(wxVERTICAL, this, "&Buttons");
+    wxStaticBox* const sizerBtnsBox = sizerBtns->GetStaticBox();
 
-    wxFlexGridSizer * const sizerBtns = new wxFlexGridSizer(2, 5, 5);
-    sizerBtns->AddGrowableCol(1);
+    wxFlexGridSizer * const sizerBtnDetails = new wxFlexGridSizer(2, 5, 5);
+    sizerBtnDetails->AddGrowableCol(1);
 
-    sizerBtns->Add(new wxStaticText(this, wxID_ANY, "Button(s)"));
-    sizerBtns->Add(new wxStaticText(this, wxID_ANY, "Custom label"));
+    sizerBtnDetails->Add(new wxStaticText(sizerBtnsBox, wxID_ANY, "Button(s)"));
+    sizerBtnDetails->Add(new wxStaticText(sizerBtnsBox, wxID_ANY, "Custom label"));
 
     for ( int n = 0; n < Btn_Max; n++ )
     {
-        m_buttons[n] = new wxCheckBox(this, wxID_ANY, ms_btnInfo[n].name);
-        sizerBtns->Add(m_buttons[n], wxSizerFlags().Centre().Left());
+        m_buttons[n] = new wxCheckBox(sizerBtnsBox, wxID_ANY, ms_btnInfo[n].name);
+        sizerBtnDetails->Add(m_buttons[n], wxSizerFlags().Centre().Left());
 
-        m_labels[n] = new wxTextCtrl(this, wxID_ANY);
-        sizerBtns->Add(m_labels[n], wxSizerFlags().Expand());
+        m_labels[n] = new wxTextCtrl(sizerBtnsBox, wxID_ANY);
+        sizerBtnDetails->Add(m_labels[n], wxSizerFlags().Expand());
 
         m_labels[n]->Bind(wxEVT_UPDATE_UI,
                           &TestMessageBoxDialog::OnUpdateLabelUI, this);
     }
 
-    sizerBtnsBox->Add(sizerBtns, wxSizerFlags().Expand());
-    sizerTop->Add(sizerBtnsBox, wxSizerFlags().Expand().Border());
+    sizerBtns->Add(sizerBtnDetails, wxSizerFlags().Expand());
+    sizerTop->Add(sizerBtns, wxSizerFlags().Expand().Border());
 
 
     // icon choice
@@ -4248,15 +4271,16 @@ bool TestMessageBoxDialog::Create()
 
 
     // miscellaneous other stuff
-    wxSizer * const
+    wxStaticBoxSizer * const
         sizerFlags = new wxStaticBoxSizer(wxHORIZONTAL, this, "&Other flags");
+    wxStaticBox* const sizerFlagsBox = sizerFlags->GetStaticBox();
 
-    m_chkNoDefault = new wxCheckBox(this, wxID_ANY, "Make \"No\" &default");
+    m_chkNoDefault = new wxCheckBox(sizerFlagsBox, wxID_ANY, "Make \"No\" &default");
     m_chkNoDefault->Bind(wxEVT_UPDATE_UI,
                          &TestMessageBoxDialog::OnUpdateNoDefaultUI, this);
     sizerFlags->Add(m_chkNoDefault, wxSizerFlags().Border());
 
-    m_chkCentre = new wxCheckBox(this, wxID_ANY, "Centre on &parent");
+    m_chkCentre = new wxCheckBox(sizerFlagsBox, wxID_ANY, "Centre on &parent");
     sizerFlags->Add(m_chkCentre, wxSizerFlags().Border());
 
     // add any additional flag from subclasses
@@ -4461,29 +4485,30 @@ TestRichMessageDialog::TestRichMessageDialog(wxWindow *parent)
 
 void TestRichMessageDialog::AddAdditionalTextOptions(wxSizer *sizer)
 {
-    wxSizer * const sizerMsgs = new wxStaticBoxSizer(wxVERTICAL, this,
+    wxStaticBoxSizer * const sizerMsgs = new wxStaticBoxSizer(wxVERTICAL, this,
                                                      "&Additional Elements");
+    wxStaticBox* const sizerMsgsBox = sizerMsgs->GetStaticBox();
 
     // add an option to show a check box.
     wxSizer * const sizerCheckBox = new wxBoxSizer(wxHORIZONTAL);
-    sizerCheckBox->Add(new wxStaticText(this, wxID_ANY, "&Check box:"),
+    sizerCheckBox->Add(new wxStaticText(sizerMsgsBox, wxID_ANY, "&Check box:"),
                        wxSizerFlags().Centre().Border(wxRIGHT));
-    m_textCheckBox = new wxTextCtrl(this, wxID_ANY);
+    m_textCheckBox = new wxTextCtrl(sizerMsgsBox, wxID_ANY);
     sizerCheckBox->Add(m_textCheckBox, wxSizerFlags(1).Centre());
     sizerMsgs->Add(sizerCheckBox, wxSizerFlags().Expand().Border(wxBOTTOM));
 
     // add option to show a detailed text.
-    sizerMsgs->Add(new wxStaticText(this, wxID_ANY, "&Detailed message:"));
-    m_textDetailed = new wxTextCtrl(this, wxID_ANY, "",
+    sizerMsgs->Add(new wxStaticText(sizerMsgsBox, wxID_ANY, "&Detailed message:"));
+    m_textDetailed = new wxTextCtrl(sizerMsgsBox, wxID_ANY, "",
                                     wxDefaultPosition, wxDefaultSize,
                                     wxTE_MULTILINE);
     sizerMsgs->Add(m_textDetailed, wxSizerFlags().Expand());
 
     // add option to show footer text
     wxSizer * const sizerFooter = new wxBoxSizer(wxHORIZONTAL);
-    sizerFooter->Add(new wxStaticText(this, wxID_ANY, "&Footer Text:"),
+    sizerFooter->Add(new wxStaticText(sizerMsgsBox, wxID_ANY, "&Footer Text:"),
         wxSizerFlags().Centre().Border(wxRIGHT));
-    m_textFooter = new wxTextCtrl(this, wxID_ANY);
+    m_textFooter = new wxTextCtrl(sizerMsgsBox, wxID_ANY);
     sizerFooter->Add(m_textFooter, wxSizerFlags(1).Centre());
 
     // add option to select footer icon
@@ -4496,9 +4521,9 @@ void TestRichMessageDialog::AddAdditionalTextOptions(wxSizer *sizer)
         "Auth needed"
     };
 
-    sizerFooter->Add(new wxStaticText(this, wxID_ANY, "Icon:"),
+    sizerFooter->Add(new wxStaticText(sizerMsgsBox, wxID_ANY, "Icon:"),
         wxSizerFlags().Centre().Border(wxLEFT));
-    m_iconsFooter = new wxChoice(this, wxID_ANY,
+    m_iconsFooter = new wxChoice(sizerMsgsBox, wxID_ANY,
         wxDefaultPosition, wxDefaultSize,
         WXSIZEOF(icons), icons);
     // Make the None the default:
@@ -4510,12 +4535,12 @@ void TestRichMessageDialog::AddAdditionalTextOptions(wxSizer *sizer)
     sizer->Add(sizerMsgs, wxSizerFlags().Expand().Border());
 }
 
-void TestRichMessageDialog::AddAdditionalFlags(wxSizer *sizer)
+void TestRichMessageDialog::AddAdditionalFlags(wxStaticBoxSizer *sizer)
 {
     // add checkbox to set the initial state for the checkbox shown
     // in the dialog.
     m_initialValueCheckBox =
-        new wxCheckBox(this, wxID_ANY, "Checkbox initially checked");
+        new wxCheckBox(sizer->GetStaticBox(), wxID_ANY, "Checkbox initially checked");
     sizer->Add(m_initialValueCheckBox, wxSizerFlags().Border());
 }
 
@@ -4563,9 +4588,9 @@ class MyLogGui : public wxLogGui
 private:
     virtual void DoShowSingleLogMessage(const wxString& message,
                                         const wxString& title,
-                                        int style) wxOVERRIDE
+                                        int style) override
     {
-        wxMessageDialog dlg(NULL, message, title,
+        wxMessageDialog dlg(nullptr, message, title,
                             wxOK | wxCANCEL | wxCANCEL_DEFAULT | style);
         dlg.SetOKCancelLabels(wxID_COPY, wxID_OK);
         dlg.SetExtendedMessage("Note that this is a custom log dialog.");

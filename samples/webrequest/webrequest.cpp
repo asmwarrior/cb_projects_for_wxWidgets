@@ -14,6 +14,7 @@
     #include "wx/wx.h"
 #endif
 
+#include "wx/cmdline.h"
 #include "wx/notebook.h"
 #include "wx/artprov.h"
 #include "wx/creddlg.h"
@@ -40,8 +41,8 @@ public:
         Page_Advanced
     };
 
-    WebRequestFrame(const wxString& title):
-        wxFrame(NULL, wxID_ANY, title)
+    WebRequestFrame(const wxString& title, const wxString& url) :
+        wxFrame(nullptr, wxID_ANY, title)
     {
         // set the frame icon
         SetIcon(wxICON(sample));
@@ -54,7 +55,8 @@ public:
         mainSizer->Add(new wxStaticText(this, wxID_ANY, "Request URL:"),
             wxSizerFlags().Border());
         m_urlTextCtrl = new wxTextCtrl(this, wxID_ANY,
-            "https://www.wxwidgets.org/downloads/logos/blocks.png",
+            url.empty() ? wxString("https://www.wxwidgets.org/downloads/logos/blocks.png")
+                        : url,
             wxDefaultPosition, wxDefaultSize,
             wxTE_PROCESS_ENTER);
         mainSizer->Add(m_urlTextCtrl,
@@ -103,6 +105,9 @@ public:
         m_textResponseTextCtrl->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
         textSizer->Add(m_textResponseTextCtrl,
             wxSizerFlags(1).Expand().Border(wxLEFT | wxRIGHT | wxBOTTOM));
+
+        m_persistentStorageCheckBox = new wxCheckBox(textPanel, wxID_ANY, "Enable persistent storage");
+        textSizer->Add(m_persistentStorageCheckBox, wxSizerFlags().Border());
 
         textPanel->SetSizer(textSizer);
         m_notebook->AddPage(textPanel, "Text");
@@ -175,6 +180,8 @@ public:
 
         m_downloadProgressTimer.Bind(wxEVT_TIMER,
             &WebRequestFrame::OnProgressTimer, this);
+
+        m_urlTextCtrl->SetFocus();
     }
 
     virtual ~WebRequestFrame()
@@ -192,6 +199,15 @@ public:
     void OnStartButton(wxCommandEvent& WXUNUSED(evt))
     {
         wxLogStatus(this, "Started request...");
+
+        if (m_notebook->GetSelection() == Page_Text && m_persistentStorageCheckBox->IsEnabled())
+        {
+            if (!wxWebSession::GetDefault().EnablePersistentStorage(m_persistentStorageCheckBox->IsChecked()) &&
+                m_persistentStorageCheckBox->IsChecked())
+                wxLogDebug("Persistent storage is not supported by the current backend");
+
+            m_persistentStorageCheckBox->Disable();
+        }
 
         // Create request for the specified URL from the default session
         m_currentRequest = wxWebSession::GetDefault().CreateRequest(this,
@@ -469,6 +485,7 @@ private:
     wxTextCtrl* m_postContentTypeTextCtrl;
     wxTextCtrl* m_postRequestTextCtrl;
     wxTextCtrl* m_textResponseTextCtrl;
+    wxCheckBox* m_persistentStorageCheckBox;
 
     wxGauge* m_downloadGauge;
     wxStaticText* m_downloadStaticText;
@@ -486,7 +503,7 @@ private:
 class WebRequestApp : public wxApp
 {
 public:
-    virtual bool OnInit() wxOVERRIDE
+    virtual bool OnInit() override
     {
         if ( !wxApp::OnInit() )
             return false;
@@ -494,11 +511,33 @@ public:
         wxInitAllImageHandlers();
 
         // create the main application window
-        WebRequestFrame *frame = new WebRequestFrame("wxWebRequest Sample App");
+        WebRequestFrame *frame = new WebRequestFrame("wxWebRequest Sample App", m_url);
         frame->Show(true);
 
         return true;
     }
+
+    virtual void OnInitCmdLine(wxCmdLineParser& parser) override
+    {
+        parser.AddParam("url", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL);
+
+        wxApp::OnInitCmdLine(parser);
+    }
+
+    virtual bool OnCmdLineParsed(wxCmdLineParser& parser) override
+    {
+        if ( !wxApp::OnCmdLineParsed(parser) )
+            return false;
+
+        if ( parser.GetParamCount() > 0 )
+            m_url = parser.GetParam(0);
+
+        return true;
+    }
+
+private:
+    // URL specified on the command line, if any.
+    wxString m_url;
 };
 
 wxIMPLEMENT_APP(WebRequestApp);

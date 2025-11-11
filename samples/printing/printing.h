@@ -2,7 +2,6 @@
 // Name:        samples/printing.h
 // Purpose:     Printing demo for wxWidgets
 // Author:      Julian Smart
-// Modified by:
 // Created:     1995
 // Copyright:   (c) Julian Smart
 // Licence:     wxWindows licence
@@ -14,8 +13,8 @@ class MyApp: public wxApp
 public:
     MyApp() {}
 
-    virtual bool OnInit() wxOVERRIDE;
-    virtual int OnExit() wxOVERRIDE;
+    virtual bool OnInit() override;
+    virtual int OnExit() override;
 
     void Draw(wxDC& dc);
 
@@ -76,7 +75,7 @@ public:
     MyCanvas(wxFrame *frame, long style);
 
     //void OnPaint(wxPaintEvent& evt);
-    virtual void OnDraw(wxDC& dc) wxOVERRIDE;
+    virtual void OnDraw(wxDC& dc) override;
 
 private:
     wxDECLARE_EVENT_TABLE();
@@ -86,13 +85,19 @@ private:
 class MyPrintout: public wxPrintout
 {
 public:
-    MyPrintout(MyFrame* frame, const wxString &title = "My printout")
-        : wxPrintout(title) { m_frame=frame; }
+    MyPrintout(MyFrame* frame,
+               wxPrintDialogData* printDlgData,
+               const wxString& title = "My printout")
+        : wxPrintout(title)
+    {
+        m_frame = frame;
+        m_printDlgData = printDlgData;
+    }
 
-    virtual bool OnPrintPage(int page) wxOVERRIDE;
-    virtual bool HasPage(int page) wxOVERRIDE;
-    virtual bool OnBeginDocument(int startPage, int endPage) wxOVERRIDE;
-    virtual void GetPageInfo(int *minPage, int *maxPage, int *selPageFrom, int *selPageTo) wxOVERRIDE;
+    virtual bool OnPrintPage(int page) override;
+    virtual bool HasPage(int page) override;
+    virtual bool OnBeginDocument(int startPage, int endPage) override;
+    virtual wxPrintPageRange GetPagesInfo(wxPrintPageRanges& ranges) override;
 
     void DrawPageOne();
     void DrawPageTwo();
@@ -102,6 +107,7 @@ public:
 
 private:
     MyFrame *m_frame;
+    wxPrintDialogData* m_printDlgData;
 };
 
 

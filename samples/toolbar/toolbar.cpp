@@ -2,7 +2,6 @@
 // Name:        toolbar.cpp
 // Purpose:     wxToolBar sample
 // Author:      Julian Smart
-// Modified by:
 // Created:     04/01/98
 // Copyright:   (c) Julian Smart
 // Licence:     wxWindows licence
@@ -31,6 +30,7 @@
 #include "wx/filedlg.h"
 #include "wx/colordlg.h"
 #include "wx/srchctrl.h"
+#include "wx/checkbox.h"
 
 // If this is 1, the sample will test an extra toolbar identical to the
 // main one, but not managed by the frame. This can test subtle differences
@@ -101,7 +101,7 @@ enum Positions
 class MyApp : public wxApp
 {
 public:
-    bool OnInit() wxOVERRIDE;
+    bool OnInit() override;
 };
 
 // Define a new frame
@@ -152,9 +152,11 @@ public:
     void OnUpdateCopyAndCut(wxUpdateUIEvent& event);
     void OnUpdateToggleHorzText(wxUpdateUIEvent& event);
     void OnUpdateNeedsToolbar(wxUpdateUIEvent& event)
-        { event.Enable( GetToolBar() != NULL ); }
+        { event.Enable( GetToolBar() != nullptr ); }
     void OnUpdateToggleRadioBtn(wxUpdateUIEvent& event)
-        { event.Enable( m_tbar != NULL ); }
+        { event.Enable( m_tbar != nullptr ); }
+
+    void OnCheckboxUpdateUI(wxUpdateUIEvent& evt);
 
 private:
     void DoEnablePrint();
@@ -187,7 +189,7 @@ private:
     // the path to the custom bitmap for the test toolbar tool
     wxString            m_pathBmp;
 
-    // the search tool, initially NULL
+    // the search tool, initially nullptr
     wxToolBarToolBase *m_searchTool;
 
     wxDECLARE_EVENT_TABLE();
@@ -197,7 +199,7 @@ private:
 // constants
 // ----------------------------------------------------------------------------
 
-const int ID_TOOLBAR = 500;
+const int ID_TOOLBAR = wxID_HIGHEST;
 
 static const long TOOLBAR_STYLE = wxTB_FLAT | wxTB_DOCKABLE | wxTB_TEXT;
 
@@ -245,7 +247,10 @@ enum
     IDM_TOOLBAR_TOGGLERADIOBTN2,
     IDM_TOOLBAR_TOGGLERADIOBTN3,
 
-    ID_COMBO = 1000
+    ID_COMBO = 1000,
+    ID_3CHECK,
+    ID_UI_2CHECK_UPDATED,
+    ID_UI_3CHECK_UPDATED,
 };
 
 // ----------------------------------------------------------------------------
@@ -307,6 +312,10 @@ wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)
                         MyFrame::OnUpdateToggleRadioBtn)
     EVT_UPDATE_UI(IDM_TOOLBAR_TOGGLE_HORIZONTAL_TEXT,
                   MyFrame::OnUpdateToggleHorzText)
+    EVT_UPDATE_UI(ID_UI_2CHECK_UPDATED,
+                  MyFrame::OnCheckboxUpdateUI)
+    EVT_UPDATE_UI(ID_UI_3CHECK_UPDATED,
+                  MyFrame::OnCheckboxUpdateUI)
 wxEND_EVENT_TABLE()
 
 // ============================================================================
@@ -348,16 +357,16 @@ void MyFrame::RecreateToolbar()
     wxToolBarBase *toolBar = GetToolBar();
     long style = toolBar ? toolBar->GetWindowStyle() : TOOLBAR_STYLE;
 
-    if (toolBar && m_searchTool && m_searchTool->GetToolBar() == NULL)
+    if (toolBar && m_searchTool && m_searchTool->GetToolBar() == nullptr)
     {
         // see ~MyFrame()
         toolBar->AddTool(m_searchTool);
     }
-    m_searchTool = NULL;
+    m_searchTool = nullptr;
 
     delete toolBar;
 
-    SetToolBar(NULL);
+    SetToolBar(nullptr);
 
     style &= ~(wxTB_HORIZONTAL | wxTB_VERTICAL | wxTB_BOTTOM | wxTB_RIGHT | wxTB_HORZ_LAYOUT);
     switch( m_toolbarPosition )
@@ -391,6 +400,12 @@ void MyFrame::RecreateToolbar()
 
 void MyFrame::PopulateToolbar(wxToolBarBase* toolBar)
 {
+    // If using wxUPDATE_UI_PROCESS_ALL (the default),
+    // some of the problems handling controls in toolbar
+    // are masked by the calls to wxCheckBox::UpdateWindowUI()
+    wxUpdateUIEvent::SetMode(wxUPDATE_UI_PROCESS_SPECIFIED);
+    toolBar->SetExtraStyle(toolBar->GetExtraStyle() | wxWS_EX_PROCESS_UI_UPDATES);
+
     // Set up toolbar
     enum
     {
@@ -471,6 +486,28 @@ void MyFrame::PopulateToolbar(wxToolBarBase* toolBar)
         combo->Append("in a");
         combo->Append("toolbar");
         toolBar->AddControl(combo, "Combo Label");
+
+#if wxUSE_CHECKBOX
+        wxCheckBox* checkbox1 = new wxCheckBox(toolBar, ID_3CHECK,
+                                                    "",
+                                                    wxDefaultPosition, wxDefaultSize,
+                                                    wxCHK_3STATE | wxCHK_ALLOW_3RD_STATE_FOR_USER);
+        checkbox1->SetToolTip("Checking this checkbox changes the state of the "
+                              "two other ones using wxEVT_UPDATE_UI handler");
+        toolBar->AddControl(checkbox1, "1");
+        wxCheckBox* checkbox2 = new wxCheckBox(toolBar, ID_UI_2CHECK_UPDATED,
+                                                    "",
+                                                    wxDefaultPosition, wxDefaultSize,
+                                                    wxCHK_2STATE);
+        checkbox2->Disable();
+        toolBar->AddControl(checkbox2, "2");
+        wxCheckBox* checkbox3 = new wxCheckBox(toolBar, ID_UI_3CHECK_UPDATED,
+                                                    "",
+                                                    wxDefaultPosition, wxDefaultSize,
+                                                    wxCHK_3STATE);
+        checkbox3->Disable();
+        toolBar->AddControl(checkbox3, "3");
+#endif
     }
 #endif // USE_CONTROLS_IN_TOOLBAR
 
@@ -529,25 +566,25 @@ void MyFrame::PopulateToolbar(wxToolBarBase* toolBar)
                 {
                 }
 
-                wxSize GetDefaultSize() const wxOVERRIDE
+                wxSize GetDefaultSize() const override
                 {
                     return m_sizeDef;
                 }
 
-                wxSize GetPreferredBitmapSizeAtScale(double scale) const wxOVERRIDE
+                wxSize GetPreferredBitmapSizeAtScale(double scale) const override
                 {
                     // We just scale the bitmap to fit the requested size, so
                     // we don't really have any preferences.
                     return m_sizeDef*scale;
                 }
 
-                wxBitmap GetBitmap(const wxSize& size) wxOVERRIDE
+                wxBitmap GetBitmap(const wxSize& size) override
                 {
                     // In this simple implementation we don't bother caching
                     // anything.
                     wxImage image = m_image;
                     if ( image.GetSize() != size )
-                        image.Rescale(size.x, size.y, wxIMAGE_QUALITY_HIGH);
+                        image.Rescale(size, wxIMAGE_QUALITY_HIGH);
 
                     // This is required under MSW in order to be able to draw
                     // over the bitmap using wxDC. For full alpha support,
@@ -594,15 +631,15 @@ void MyFrame::PopulateToolbar(wxToolBarBase* toolBar)
 
 // Define my frame constructor
 MyFrame::MyFrame()
-       : wxFrame(NULL, wxID_ANY, "wxToolBar Sample")
+       : wxFrame(nullptr, wxID_ANY, "wxToolBar Sample")
 {
-    m_tbar = NULL;
+    m_tbar = nullptr;
 
     m_smallToolbar = true;
     m_horzText = false;
     m_useCustomDisabled = false;
     m_showTooltips = true;
-    m_searchTool = NULL;
+    m_searchTool = nullptr;
 
     m_rows = 1;
     m_nPrint = 0; // set to 1 in PopulateToolbar()
@@ -782,7 +819,7 @@ void MyFrame::OnToggleToolbar(wxCommandEvent& WXUNUSED(event))
     }
     else
     {
-        // notice that there is no need to call SetToolBar(NULL) here (although
+        // notice that there is no need to call SetToolBar(nullptr) here (although
         // this it is harmless to do and it must be called if you do not delete
         // the toolbar but keep it for later reuse), just delete the toolbar
         // directly and it will reset the associated frame toolbar pointer
@@ -1000,6 +1037,33 @@ void MyFrame::OnUpdateToggleHorzText(wxUpdateUIEvent& event)
     event.Enable( tbar &&
                     tbar->HasFlag(wxTB_TEXT) &&
                         !tbar->HasFlag(wxTB_NOICONS) );
+}
+
+// copy state from user-controllable checkbox to disabled checkbox
+void MyFrame::OnCheckboxUpdateUI(wxUpdateUIEvent& evt)
+{
+#if wxUSE_CHECKBOX
+    wxASSERT(evt.IsCheckable());
+    wxToolBar* tbar = GetToolBar();
+    wxWindow* wnd = tbar->FindWindow(ID_3CHECK);
+    wxCheckBox* src = wxCheckCast<wxCheckBox>(wnd);
+    if (!evt.Is3State())
+    {
+        if (src->Get3StateValue() != wxCHK_UNDETERMINED)
+        {
+            evt.Show(true);
+            evt.Check(src->Get3StateValue() != wxCHK_UNCHECKED);
+        }
+        else
+        {
+            evt.Show(false);
+        }
+    }
+    else
+    {
+        evt.Set3StateValue(src->Get3StateValue());
+    }
+#endif
 }
 
 void MyFrame::OnChangeToolTip(wxCommandEvent& WXUNUSED(event))

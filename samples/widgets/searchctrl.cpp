@@ -65,14 +65,14 @@ enum
 class SearchCtrlWidgetsPage : public WidgetsPage
 {
 public:
-    SearchCtrlWidgetsPage(WidgetsBookCtrl *book, wxImageList *imaglist);
+    SearchCtrlWidgetsPage(WidgetsBookCtrl *book, wxVector<wxBitmapBundle>& imaglist);
 
-    virtual wxWindow *GetWidget() const wxOVERRIDE { return m_srchCtrl; }
-    virtual wxTextEntryBase *GetTextEntry() const wxOVERRIDE { return m_srchCtrl; }
-    virtual void RecreateWidget() wxOVERRIDE;
+    virtual wxWindow *GetWidget() const override { return m_srchCtrl; }
+    virtual wxTextEntryBase *GetTextEntry() const override { return m_srchCtrl; }
+    virtual void RecreateWidget() override;
 
     // lazy creation of the content
-    virtual void CreateContent() wxOVERRIDE;
+    virtual void CreateContent() override;
 
 protected:
 
@@ -127,7 +127,7 @@ wxEND_EVENT_TABLE()
 // implementation
 // ============================================================================
 
-#if defined(__WXMAC__) || defined(__WXGTK20__)
+#if defined(__WXMAC__) || defined(__WXGTK__)
     #define FAMILY_CTRLS NATIVE_CTRLS
 #else
     #define FAMILY_CTRLS GENERIC_CTRLS
@@ -137,34 +137,33 @@ IMPLEMENT_WIDGETS_PAGE(SearchCtrlWidgetsPage, "SearchCtrl",
                        FAMILY_CTRLS | EDITABLE_CTRLS | ALL_CTRLS);
 
 SearchCtrlWidgetsPage::SearchCtrlWidgetsPage(WidgetsBookCtrl *book,
-                                     wxImageList *imaglist)
+                                     wxVector<wxBitmapBundle>& imaglist)
                   : WidgetsPage(book, imaglist, text_xpm)
 {
 }
 
 void SearchCtrlWidgetsPage::CreateContent()
 {
-    m_srchCtrl = NULL;
+    m_srchCtrl = nullptr;
 
     CreateControl();
 
 
-    wxSizer* box = new wxStaticBoxSizer(
-        new wxStaticBox(this, -1, "Options"),
-        wxVERTICAL);
+    wxStaticBoxSizer* sizerOptions = new wxStaticBoxSizer(wxVERTICAL, this, "Options");
+    wxStaticBox* const sizerOptionsBox = sizerOptions->GetStaticBox();
 
-    m_searchBtnCheck = new wxCheckBox(this, ID_SEARCH_CB, "Search button");
-    m_cancelBtnCheck = new wxCheckBox(this, ID_CANCEL_CB, "Cancel button");
-    m_menuBtnCheck   = new wxCheckBox(this, ID_MENU_CB,   "Search menu");
+    m_searchBtnCheck = new wxCheckBox(sizerOptionsBox, ID_SEARCH_CB, "Search button");
+    m_cancelBtnCheck = new wxCheckBox(sizerOptionsBox, ID_CANCEL_CB, "Cancel button");
+    m_menuBtnCheck   = new wxCheckBox(sizerOptionsBox, ID_MENU_CB,   "Search menu");
 
     m_searchBtnCheck->SetValue(true);
 
-    box->Add(m_searchBtnCheck, wxSizerFlags().Border());
-    box->Add(m_cancelBtnCheck, wxSizerFlags().Border());
-    box->Add(m_menuBtnCheck,   wxSizerFlags().Border());
+    sizerOptions->Add(m_searchBtnCheck, wxSizerFlags().Border());
+    sizerOptions->Add(m_cancelBtnCheck, wxSizerFlags().Border());
+    sizerOptions->Add(m_menuBtnCheck,   wxSizerFlags().Border());
 
     wxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
-    sizer->Add(box, wxSizerFlags().Expand().TripleBorder());
+    sizer->Add(sizerOptions, wxSizerFlags().Expand().TripleBorder());
     sizer->Add(m_srchCtrl, wxSizerFlags().Centre().TripleBorder());
 
     SetSizer(sizer);
@@ -179,6 +178,8 @@ void SearchCtrlWidgetsPage::CreateControl()
 
     m_srchCtrl = new wxSearchCtrl(this, -1, wxEmptyString, wxDefaultPosition,
                                   FromDIP(wxSize(150, -1)), style);
+
+    NotifyWidgetRecreation(m_srchCtrl);
 }
 
 void SearchCtrlWidgetsPage::RecreateWidget()
@@ -225,7 +226,7 @@ void SearchCtrlWidgetsPage::OnToggleSearchMenu(wxCommandEvent&)
     if ( m_menuBtnCheck->GetValue() )
         m_srchCtrl->SetMenu( CreateTestMenu() );
     else
-        m_srchCtrl->SetMenu(NULL);
+        m_srchCtrl->SetMenu(nullptr);
 }
 
 void SearchCtrlWidgetsPage::OnText(wxCommandEvent& event)

@@ -12,10 +12,10 @@
 #include "oglstuff.h"
 
 // External function for GL errors
-myOGLErrHandler* externalMyOGLErrHandler = NULL;
+myOGLErrHandler* externalMyOGLErrHandler = nullptr;
 
 // Allow GL errors to be handled in other part of the app.
-bool MyOnGLError(int err, const GLchar* glMsg = NULL)
+bool MyOnGLError(int err, const GLchar* glMsg = nullptr)
 {
     GLenum GLErrorVal = glGetError();
 
@@ -27,7 +27,7 @@ bool MyOnGLError(int err, const GLchar* glMsg = NULL)
         return true;
     }
 
-    if ( (GLErrorVal == GL_NO_ERROR) && (glMsg == NULL) )
+    if ( (GLErrorVal == GL_NO_ERROR) && (glMsg == nullptr) )
         return true;
 
     if ( externalMyOGLErrHandler )
@@ -385,7 +385,7 @@ void myOGLShaders::Init()
     for (shaShas_v::iterator it = m_shaCode.begin(); it != m_shaCode.end(); ++it)
     {
         it->shaId = glCreateShader(it->typeSha);
-        glShaderSource(it->shaId, 1, &(it->scode), NULL);
+        glShaderSource(it->shaId, 1, &(it->scode), nullptr);
         MyOnGLError(myoglERR_SHADERCREATE);
 
         resC = Compile(it->shaId);
@@ -527,7 +527,7 @@ void myLight::Set(const myVec3& position, GLfloat intensity,
 myOGLTriangles::myOGLTriangles()
 {
     m_triangVAO = m_bufVertId = m_bufColNorId = m_bufIndexId = 0;
-    m_triangShaders = NULL;
+    m_triangShaders = nullptr;
 }
 
 myOGLTriangles::~myOGLTriangles()
@@ -557,7 +557,7 @@ void myOGLTriangles::Clear()
 
     glFlush(); //Tell GL to execute those commands now, but we don't wait for them
 
-    m_triangShaders = NULL;
+    m_triangShaders = nullptr;
     m_triangVAO = m_bufIndexId = m_bufColNorId = m_bufVertId = 0;
 }
 
@@ -568,7 +568,7 @@ void myOGLTriangles::SetBuffers(myOGLShaders* theShader,
 {
     MyOnGLError(myoglERR_CLEAR); //clear error stack
 
-    // NOTE: have you realized that I fully trust on parameters being != 0 and != NULL?
+    // NOTE: have you realized that I fully trust on parameters being != 0 and != nullptr?
 
     // Part 1: Buffers - - - - - - - - - - - - - - - - - - -
 
@@ -592,7 +592,7 @@ void myOGLTriangles::SetBuffers(myOGLShaders* theShader,
     glBindBuffer(GL_ARRAY_BUFFER, m_bufColNorId);
     // Allocate space for both arrays
     nBytes = (nuPoints * 4 + nuTriangs * 3) * sizeof(GLfloat);
-    glBufferData(GL_ARRAY_BUFFER, nBytes, NULL, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, nBytes, nullptr, GL_STATIC_DRAW);
     if ( ! MyOnGLError(myoglERR_BUFFER) )
     {
         // Likely the GPU got out of memory
@@ -644,12 +644,12 @@ void myOGLTriangles::SetBuffers(myOGLShaders* theShader,
     glBindBuffer(GL_ARRAY_BUFFER, m_bufVertId);
     GLuint loc = m_triangShaders->GetAttribLoc("in_Position");
     glEnableVertexAttribArray(loc);
-    glVertexAttribPointer(loc, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
+    glVertexAttribPointer(loc, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
     // Colours
     glBindBuffer(GL_ARRAY_BUFFER, m_bufColNorId);
     loc = m_triangShaders->GetAttribLoc("in_Colour");
     glEnableVertexAttribArray(loc);
-    glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
+    glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
     // Normals. Their position in buffer starts at bufoffset
     loc = m_triangShaders->GetAttribLoc("in_Normal");
     glEnableVertexAttribArray(loc);
@@ -691,7 +691,7 @@ void myOGLTriangles::Draw(const GLfloat* unifMvp, const GLfloat* unifToVw,
     glProvokingVertex(GL_FIRST_VERTEX_CONVENTION);
 
     // Indexed drawing the triangles in strip mode, using 6 indices
-    glDrawElements(GL_TRIANGLE_STRIP, 6, GL_UNSIGNED_SHORT, (GLvoid *)0);
+    glDrawElements(GL_TRIANGLE_STRIP, 6, GL_UNSIGNED_SHORT, nullptr);
 
     MyOnGLError(myoglERR_DRAWING_TRI);
 
@@ -707,7 +707,7 @@ void myOGLTriangles::Draw(const GLfloat* unifMvp, const GLfloat* unifToVw,
 myOGLString::myOGLString()
 {
     m_bufPosId = m_textureId = m_stringVAO = m_textureUnit = 0;
-    m_stringShaders = NULL;
+    m_stringShaders = nullptr;
 }
 
 myOGLString::~myOGLString()
@@ -740,7 +740,7 @@ void myOGLString::Clear()
     glFlush(); //Tell GL to execute those commands now, but we don't wait for them
 
     m_bufPosId = m_textureId = m_stringVAO = m_textureUnit = 0;
-    m_stringShaders = NULL;
+    m_stringShaders = nullptr;
 }
 
 void myOGLString::SetStringWithVerts(myOGLShaders* theShader,
@@ -759,7 +759,7 @@ void myOGLString::SetStringWithVerts(myOGLShaders* theShader,
     glBindBuffer(GL_ARRAY_BUFFER, m_bufPosId);
     // (4+4) (vertices + normals) x 3 components + 4 text-vertices x 2 components
     GLsizeiptr nBytes = (8 * 3 + 4 * 2) * sizeof(GLfloat);
-    glBufferData(GL_ARRAY_BUFFER, nBytes, NULL, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, nBytes, nullptr, GL_STATIC_DRAW);
 
     if ( ! MyOnGLError(myoglERR_BUFFER) )
     {
@@ -803,7 +803,7 @@ void myOGLString::SetStringWithVerts(myOGLShaders* theShader,
     // Vertices positions
     GLuint loc = m_stringShaders->GetAttribLoc("in_sPosition");
     glEnableVertexAttribArray(loc);
-    glVertexAttribPointer(loc, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
+    glVertexAttribPointer(loc, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
     // Normals. Their position in buffer starts at bufoffset
     bufoffset = 12 * sizeof(GLfloat);
     if ( norm )
@@ -925,7 +925,7 @@ void myOGLImmutString::SetImmutString(myOGLShaders* theShader,
     SetAsGLFloat4x4(imaVerts, fimaVerts, 12);
 
     // Call the base class without normals, it will handle this case
-    SetStringWithVerts(theShader, tImage, tWidth, tHeigh, fimaVerts, NULL);
+    SetStringWithVerts(theShader, tImage, tWidth, tHeigh, fimaVerts, nullptr);
 }
 
 void myOGLImmutString::SetOrtho(int winWidth, int winHeight)
@@ -1092,23 +1092,6 @@ double myOGLCamera::GetTrackballZ(double x, double y, double r)
     return  (d < r2/2.0) ? sqrt(r2 - d) : r2/2.0/sqrt(d);
 }
 
-void myOGLCamera::MouseWheel(int wheel)
-{
-    // update the m_fov
-    // From degrees to radians
-    const double degToRad = (double) 4.0 * atan(1.0) / 180.0;
-    // Angle of the field of view
-    // the original m_fov = 40.0 * degToRad; //radians
-    m_fov += wheel/120.0 * degToRad;
-
-    // Calculate the projection matrix
-    double aspect = (double) m_winWidth / m_winHeight;
-    MyPerspective(m_fov, aspect, m_nearD, m_farD, m_dProj);
-
-    // Inform we need to calculate MVP matrix
-    m_needMVPUpdate = true;
-}
-
 
 // ----------------------------------------------------------------------------
 // myOGLManager
@@ -1262,7 +1245,7 @@ void myOGLManager::Render()
     m_StringOnPyr.Draw(m_Camera.GetFloatMVP(), m_Camera.GetFloatToVw(), &m_Light);
     // This string is at the very front, whatever z-coords are given
     glDisable(GL_DEPTH_TEST);
-    m_ImmString.Draw(m_ImmString.GetFloatMVP(), NULL, NULL);
+    m_ImmString.Draw(m_ImmString.GetFloatMVP(), nullptr, nullptr);
 }
 
 void myOGLManager::OnMouseButDown(int posX, int posY)
@@ -1277,9 +1260,4 @@ void myOGLManager::OnMouseRotDragging(int posX, int posY)
     m_Camera.MouseRotation(m_mousePrevX, m_mousePrevY, posX, posY);
     m_mousePrevX = posX;
     m_mousePrevY = posY;
-}
-
-void myOGLManager::OnMouseWheel(int wheel)
-{
-    m_Camera.MouseWheel(wheel);
 }

@@ -64,14 +64,14 @@ enum
 class FileCtrlWidgetsPage : public WidgetsPage
 {
 public:
-    FileCtrlWidgetsPage( WidgetsBookCtrl *book, wxImageList *imaglist );
+    FileCtrlWidgetsPage( WidgetsBookCtrl *book, wxVector<wxBitmapBundle>& imaglist );
     virtual ~FileCtrlWidgetsPage() {}
 
-    virtual wxWindow *GetWidget() const wxOVERRIDE { return m_fileCtrl; }
-    virtual void RecreateWidget() wxOVERRIDE { CreateFileCtrl(); }
+    virtual wxWindow *GetWidget() const override { return m_fileCtrl; }
+    virtual void RecreateWidget() override { CreateFileCtrl(); }
 
     // lazy creation of the content
-    virtual void CreateContent() wxOVERRIDE;
+    virtual void CreateContent() override;
 
 protected:
     // event handlers
@@ -146,7 +146,7 @@ IMPLEMENT_WIDGETS_PAGE( FileCtrlWidgetsPage, "FileCtrl",
                         FAMILY_CTRLS );
 
 FileCtrlWidgetsPage::FileCtrlWidgetsPage( WidgetsBookCtrl *book,
-        wxImageList *imaglist )
+        wxVector<wxBitmapBundle>& imaglist )
         : WidgetsPage( book, imaglist, dirctrl_xpm )
 {
 }
@@ -173,19 +173,20 @@ void FileCtrlWidgetsPage::CreateContent()
     sizerLeft->Add( CreateSizerWithTextAndButton( FileCtrlPage_SetFilename , "Set &filename", wxID_ANY, &m_filename ),
                     0, wxALL | wxEXPAND , 5 );
 
-    wxSizer *sizerUseFlags =
-        new wxStaticBoxSizer( wxVERTICAL, this, "&Flags");
+    wxStaticBoxSizer *sizerFlags = new wxStaticBoxSizer( wxVERTICAL, this, "&Flags");
+    wxStaticBox* const sizerFlagsBox = sizerFlags->GetStaticBox();
 
-    m_chkMultiple   = CreateCheckBoxAndAddToSizer( sizerUseFlags, "wxFC_MULTIPLE");
-    m_chkNoShowHidden   = CreateCheckBoxAndAddToSizer( sizerUseFlags, "wxFC_NOSHOWHIDDEN");
-    sizerLeft->Add( sizerUseFlags, wxSizerFlags().Expand().Border() );
+    m_chkMultiple   = CreateCheckBoxAndAddToSizer( sizerFlags, "wxFC_MULTIPLE", wxID_ANY, sizerFlagsBox );
+    m_chkNoShowHidden   = CreateCheckBoxAndAddToSizer( sizerFlags, "wxFC_NOSHOWHIDDEN", wxID_ANY, sizerFlagsBox );
+    sizerLeft->Add( sizerFlags, wxSizerFlags().Expand().Border() );
 
-    wxSizer *sizerFilters =
-        new wxStaticBoxSizer( wxVERTICAL, this, "&Filters");
+    wxStaticBoxSizer *sizerFilters = new wxStaticBoxSizer( wxVERTICAL, this, "&Filters");
+    wxStaticBox* const sizerFiltersBox = sizerFilters->GetStaticBox();
+
     m_fltr[0] = CreateCheckBoxAndAddToSizer( sizerFilters, wxString::Format("all files (%s)|%s",
-                wxFileSelectorDefaultWildcardStr, wxFileSelectorDefaultWildcardStr ) );
-    m_fltr[1] = CreateCheckBoxAndAddToSizer( sizerFilters, "C++ files (*.cpp; *.h)|*.cpp;*.h" );
-    m_fltr[2] = CreateCheckBoxAndAddToSizer( sizerFilters, "PNG images (*.png)|*.png");
+                wxFileSelectorDefaultWildcardStr, wxFileSelectorDefaultWildcardStr ), wxID_ANY, sizerFiltersBox );
+    m_fltr[1] = CreateCheckBoxAndAddToSizer( sizerFilters, "C++ files (*.cpp; *.h)|*.cpp;*.h", wxID_ANY, sizerFiltersBox );
+    m_fltr[2] = CreateCheckBoxAndAddToSizer( sizerFilters, "PNG images (*.png)|*.png", wxID_ANY, sizerFiltersBox );
     sizerLeft->Add( sizerFilters, wxSizerFlags().Expand().Border() );
 
     wxButton *btn = new wxButton( this, FileCtrlPage_Reset, "&Reset" );
@@ -273,6 +274,8 @@ void FileCtrlWidgetsPage::CreateFileCtrl()
     // update our pointer
     delete m_fileCtrl;
     m_fileCtrl = fileCtrl;
+
+    NotifyWidgetRecreation(m_fileCtrl);
 
     // relayout the sizer
     GetSizer()->Layout();

@@ -2,7 +2,6 @@
 // Name:        client.cpp
 // Purpose:     Client for wxSocket demo
 // Author:      Guillermo Rodriguez Garcia <guille@iies.es>
-// Modified by:
 // Created:     1999/09/19
 // Copyright:   (c) 1999 Guillermo Rodriguez Garcia
 // Licence:     wxWindows licence
@@ -28,7 +27,8 @@
 #include "wx/url.h"
 #include "wx/sstream.h"
 #include "wx/thread.h"
-#include "wx/scopedptr.h"
+
+#include <memory>
 
 // --------------------------------------------------------------------------
 // resources
@@ -47,7 +47,7 @@
 class MyApp : public wxApp
 {
 public:
-  virtual bool OnInit() wxOVERRIDE;
+  virtual bool OnInit() override;
 };
 
 // Define a new frame type: this is going to be our main frame
@@ -198,7 +198,7 @@ bool MyApp::OnInit()
 // --------------------------------------------------------------------------
 
 // frame constructor
-MyFrame::MyFrame() : wxFrame((wxFrame *)NULL, wxID_ANY,
+MyFrame::MyFrame() : wxFrame(nullptr, wxID_ANY,
                              _("wxSocket demo: Client"),
                              wxDefaultPosition, wxSize(300, 200))
 {
@@ -235,8 +235,12 @@ MyFrame::MyFrame() : wxFrame((wxFrame *)NULL, wxID_ANY,
   // Append menus to the menubar
   m_menuBar = new wxMenuBar();
   m_menuBar->Append(m_menuFile, _("&File"));
-  m_menuBar->Append(m_menuSocket, _("&TCP"));
-  m_menuBar->Append(m_menuDatagramSocket, _("&UDP"));
+  m_menuBar->Append(m_menuSocket,
+                    /* TRANSLATORS: Transmission Control Protocol */
+                    _("&TCP"));
+  m_menuBar->Append(m_menuDatagramSocket,
+                    /* TRANSLATORS: User Datagram Protocol */
+                    _("&UDP"));
 #if wxUSE_URL
   m_menuBar->Append(m_menuProtocols, _("&Protocols"));
 #endif
@@ -324,7 +328,7 @@ void MyFrame::OpenConnection(wxSockAddress::Family family)
   wxString hostname = wxGetTextFromUser(
     _("Enter the address of the wxSocket demo server:"),
     _("Connect ..."),
-    _("localhost"));
+    "localhost");
   if ( hostname.empty() )
     return;
 
@@ -590,7 +594,7 @@ void DoDownload(const wxString& urlname)
 
     // Try to get the input stream (connects to the given URL)
     wxLogMessage("Establishing connection to \"%s\"...", urlname);
-    const wxScopedPtr<wxInputStream> data(url.GetInputStream());
+    const std::unique_ptr<wxInputStream> data(url.GetInputStream());
     if ( !data.get() )
     {
         wxLogError("Failed to retrieve URL \"%s\"", urlname);
@@ -598,9 +602,11 @@ void DoDownload(const wxString& urlname)
     }
 
     // Print the contents type and file size
-    wxLogMessage("Contents type: %s\nFile size: %lu\nStarting to download...",
+    wxLogMessage("Contents type: %s\nFile size: %s\nStarting to download...",
                  url.GetProtocol().GetContentType(),
-                 static_cast<unsigned long>( data->GetSize() ));
+                 data->GetSize() != (size_t)-1
+                    ? wxString::Format("%zu", data->GetSize())
+                    : wxString("n/a"));
 
     // Get the data
     wxStringOutputStream sout;
@@ -641,11 +647,11 @@ void MyFrame::OnTestURL(wxCommandEvent& WXUNUSED(event))
             Run();
         }
 
-        virtual void* Entry() wxOVERRIDE
+        virtual void* Entry() override
         {
             DoDownload(m_url);
 
-            return NULL;
+            return nullptr;
         }
 
     private:

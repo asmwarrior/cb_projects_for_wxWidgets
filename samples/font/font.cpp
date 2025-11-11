@@ -2,7 +2,6 @@
 // Name:        font.cpp
 // Purpose:     wxFont demo
 // Author:      Vadim Zeitlin
-// Modified by:
 // Created:     30.09.99
 // Copyright:   (c) 1999 Vadim Zeitlin
 // Licence:     wxWindows licence
@@ -61,7 +60,7 @@ public:
     // this one is called on application startup and is a good place for the app
     // initialization (doing it here and not in the ctor allows to have an error
     // return: if OnInit() returns false, the application terminates)
-    virtual bool OnInit() wxOVERRIDE;
+    virtual bool OnInit() override;
 };
 
 // FontPanel contains controls allowing to specify the font properties
@@ -152,7 +151,7 @@ public:
     void OnPaint( wxPaintEvent &event );
 
 protected:
-    virtual wxSize DoGetBestClientSize() const wxOVERRIDE
+    virtual wxSize DoGetBestClientSize() const override
     {
         return wxSize(80*GetCharWidth(), 15*GetCharHeight());
     }
@@ -267,7 +266,7 @@ enum
     Font_Quit = wxID_EXIT,
     Font_About = wxID_ABOUT,
 
-    Font_ViewMsg = wxID_HIGHEST+1,
+    Font_ViewMsg = wxID_HIGHEST,
     Font_TestTextValue,
 
     Font_IncSize,
@@ -408,7 +407,7 @@ bool MyApp::OnInit()
 
 // frame constructor
 MyFrame::MyFrame()
-       : wxFrame(NULL, wxID_ANY, "wxWidgets font sample")
+       : wxFrame(nullptr, wxID_ANY, "wxWidgets font sample")
 {
     SetIcon(wxICON(sample));
 
@@ -575,7 +574,7 @@ public:
 
 protected:
     virtual bool OnFontEncoding(const wxString& facename,
-                                const wxString& encoding) wxOVERRIDE
+                                const wxString& encoding) override
     {
         wxString text;
         text.Printf("Encoding %u: %s (available in facename '%s')\n",
@@ -611,7 +610,7 @@ public:
         { return m_facenames; }
 
 protected:
-    virtual bool OnFacename(const wxString& facename) wxOVERRIDE
+    virtual bool OnFacename(const wxString& facename) override
     {
         m_facenames.Add(facename);
         return true;
@@ -975,35 +974,7 @@ void MyFrame::DoChangeFont(const wxFont& font, const wxColour& col)
 {
     m_fontWindow->UpdateFont(font, col);
 
-#ifdef __WXMSW__
-    // enable the smooth font on Windows by default
-    // font rendering issue when using C::B under windows remote desktop
-    // https://forums.codeblocks.org/index.php/topic,25146.msg171484.html#msg171484
-
-    wxFont fontWithClearType = font;
-    wxString nativeDesc = fontWithClearType.GetNativeFontInfoDesc();
-    int index = 0;
-    for (size_t pos = 0, start = 0; pos <= nativeDesc.length(); )
-    {
-        pos = nativeDesc.find(";", start);
-        index++;
-
-        if (index == 14)
-        {
-            // enable the cleartype option of the font
-            nativeDesc.replace(start, pos - start, "5");
-            bool result = fontWithClearType.SetNativeFontInfo(nativeDesc);
-            break;
-        }
-        start = pos+1;
-    }
-
-    m_textctrl->SetFont(fontWithClearType);
-#else
     m_textctrl->SetFont(font);
-#endif // __WXMSW__
-
-
     if ( col.IsOk() )
         m_textctrl->SetForegroundColour(col);
     m_textctrl->Refresh();

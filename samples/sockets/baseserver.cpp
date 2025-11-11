@@ -2,7 +2,6 @@
 // Name:        samples/sockbase/client.cpp
 // Purpose:     Sockets sample for wxBase
 // Author:      Lukasz Michalski
-// Modified by:
 // Created:     27.06.2005
 // Copyright:   (c) 2005 Lukasz Michalski <lmichalski@user.sourceforge.net>
 // Licence:     wxWindows licence
@@ -64,7 +63,7 @@ const char *GetSocketErrorMsg(int pSockError)
 //event sent by workers to server class
 //after client is served
 const wxEventType wxEVT_WORKER = wxNewEventType();
-#define EVT_WORKER(func) wxDECLARE_EVENT_TABLE_ENTRY( wxEVT_WORKER, -1, -1, (wxObjectEventFunction) (wxEventFunction) (WorkerEventFunction) & func, (wxObject *) NULL ),
+#define EVT_WORKER(func) wxDECLARE_EVENT_TABLE_ENTRY( wxEVT_WORKER, -1, -1, wxEVENT_HANDLER_CAST(WorkerEventFunction, func), (wxObject *) nullptr ),
 
 class WorkerEvent : public wxEvent
 {
@@ -78,7 +77,7 @@ public:
         m_workerFailed = false;
     }
 
-    virtual wxEvent* Clone() const wxOVERRIDE
+    virtual wxEvent* Clone() const override
     {
         return new WorkerEvent(*this);
     }
@@ -112,11 +111,11 @@ private:
       EVENTS
     };
 
-    virtual bool OnInit() wxOVERRIDE;
-    virtual int OnExit() wxOVERRIDE;
+    virtual bool OnInit() override;
+    virtual int OnExit() override;
 
-    void OnInitCmdLine(wxCmdLineParser& pParser) wxOVERRIDE;
-    bool OnCmdLineParsed(wxCmdLineParser& pParser) wxOVERRIDE;
+    void OnInitCmdLine(wxCmdLineParser& pParser) override;
+    bool OnCmdLineParsed(wxCmdLineParser& pParser) override;
 
     void OnSocketEvent(wxSocketEvent& pEvent);
     void OnWorkerEvent(WorkerEvent& pEvent);
@@ -168,7 +167,7 @@ class ThreadWorker : public wxThread, private WorkerBase
 {
 public:
     ThreadWorker(wxSocketBase* pSocket);
-    virtual ExitCode Entry() wxOVERRIDE;
+    virtual ExitCode Entry() override;
 
 private:
     wxSocketBase* m_socket;
@@ -496,7 +495,7 @@ wxThread::ExitCode ThreadWorker::Entry()
     if (!m_socket->IsConnected())
     {
         LogWorker("ThreadWorker: not connected",wxLOG_Error);
-        return 0;
+        return nullptr;
     }
     int to_process = -1;
     if (m_socket->IsConnected())
@@ -511,7 +510,7 @@ wxThread::ExitCode ThreadWorker::Entry()
             {
                 LogWorker("ThreadWorker: Read error",wxLOG_Error);
                 wxGetApp().AddPendingEvent(e);
-                return 0;
+                return nullptr;
             }
             to_process -= m_socket->LastCount();
             LogWorker(wxString::Format("to_process: %d",to_process));
@@ -522,7 +521,7 @@ wxThread::ExitCode ThreadWorker::Entry()
         if (signature[0] == 0)
         {
             e.m_exit = true;
-            return 0;
+            return nullptr;
         }
 
         if (signature[0] == 0xCE)
@@ -530,7 +529,7 @@ wxThread::ExitCode ThreadWorker::Entry()
             LogWorker("This server does not support test2 from GUI client",wxLOG_Error);
             e.m_workerFailed = true;
             e.m_exit = true;
-            return 0;
+            return nullptr;
         }
         int size = signature[1] * (signature[0] == 0xBE ? 1 : 1024);
         char* buf = new char[size];
@@ -546,7 +545,7 @@ wxThread::ExitCode ThreadWorker::Entry()
             {
                 LogWorker("ThreadWorker: Read error",wxLOG_Error);
                 wxGetApp().AddPendingEvent(e);
-                return 0;
+                return nullptr;
             }
             to_process -= m_socket->LastCount();
             LogWorker(wxString::Format("ThreadWorker: %d bytes readed, %d todo",m_socket->LastCount(),to_process));
@@ -574,14 +573,14 @@ wxThread::ExitCode ThreadWorker::Entry()
     e.m_workerFailed = to_process != 0;
     m_socket->Destroy();
     wxGetApp().AddPendingEvent(e);
-    return 0;
+    return nullptr;
 }
 
 EventWorker::EventWorker(wxSocketBase* pSock)
   : m_socket(pSock),
-    m_inbuf(NULL),
+    m_inbuf(nullptr),
     m_infill(0),
-    m_outbuf(NULL),
+    m_outbuf(nullptr),
     m_outfill(0)
 {
     m_socket->SetNotify(wxSOCKET_LOST_FLAG|wxSOCKET_INPUT_FLAG|wxSOCKET_OUTPUT_FLAG);
@@ -601,7 +600,7 @@ EventWorker::~EventWorker()
 void
 EventWorker::DoRead()
 {
-    if (m_inbuf == NULL)
+    if (m_inbuf == nullptr)
     {
         //read message header
         do
@@ -650,7 +649,7 @@ EventWorker::DoRead()
         while(!m_socket->Error() && (2 - m_infill != 0));
     }
 
-    if (m_inbuf == NULL)
+    if (m_inbuf == nullptr)
         return;
     //read message data
     do

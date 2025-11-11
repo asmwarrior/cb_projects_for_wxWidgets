@@ -100,9 +100,7 @@ bool MyApp::OnInit()
 
     // Create the main frame window
 
-    MyFrame* frame = new MyFrame((wxFrame *)NULL, wxID_ANY, "Animation Demo",
-                                 wxDefaultPosition, wxSize(500, 400),
-                                 wxDEFAULT_FRAME_STYLE);
+    MyFrame* frame = new MyFrame(nullptr, wxID_ANY, "Animation Demo");
     frame->Show(true);
 
     return true;
@@ -115,11 +113,8 @@ bool MyApp::OnInit()
 // Define my frame constructor
 MyFrame::MyFrame(wxWindow *parent,
                  const wxWindowID id,
-                 const wxString& title,
-                 const wxPoint& pos,
-                 const wxSize& size,
-                 const long style)
-       : wxFrame(parent, id, title, pos, size, style)
+                 const wxString& title)
+       : wxFrame(parent, id, title)
 {
     SetIcon(wxICON(sample));
 
@@ -174,15 +169,26 @@ MyFrame::MyFrame(wxWindow *parent,
             wxSizerFlags().Centre().Border());
 
     m_animationCtrl = new wxAnimationCtrl(this, wxID_ANY);
-    if (m_animationCtrl->LoadFile("throbber.gif"))
+
+    wxAnimationBundle animations;
+
+    wxAnimation throbber("throbber.gif");
+    if (throbber.IsOk())
+        animations.Add(throbber);
+    wxAnimation throbber2x("throbber_2x.gif");
+    if (throbber2x.IsOk())
+        animations.Add(throbber2x);
+
+    if (animations.IsOk())
+    {
+        m_animationCtrl->SetAnimation(animations);
         m_animationCtrl->Play();
+    }
 
     sz->Add(m_animationCtrl, wxSizerFlags().Centre().Border());
     SetSizer(sz);
-}
 
-MyFrame::~MyFrame()
-{
+    SetSize(FromDIP(wxSize(500, 400)));
 }
 
 void MyFrame::OnPlay(wxCommandEvent& WXUNUSED(event))
@@ -311,7 +317,7 @@ void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event) )
 void MyFrame::OnOpen(wxCommandEvent& WXUNUSED(event))
 {
     wxFileDialog dialog(this, "Please choose an animation",
-                        wxEmptyString, wxEmptyString, "*.gif;*.ani", wxFD_OPEN);
+                        wxEmptyString, wxEmptyString, "*.gif;*.ani;*.webp", wxFD_OPEN);
     if (dialog.ShowModal() == wxID_OK)
     {
         wxString filename(dialog.GetPath());

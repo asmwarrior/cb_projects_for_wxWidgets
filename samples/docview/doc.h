@@ -21,11 +21,11 @@
 // somewhat complicates its code but is necessary in order to support building
 // it under all platforms and in all build configurations
 //
-// In your own code you would normally use std::stream classes only and so
-// wouldn't need these typedefs
+// In your own code you would normally use one set of the stream classes only
+// and so wouldn't need these typedefs and preprocessor conditions.
 #if wxUSE_STD_IOSTREAM
-    typedef wxSTD istream DocumentIstream;
-    typedef wxSTD ostream DocumentOstream;
+    typedef std::istream DocumentIstream;
+    typedef std::ostream DocumentOstream;
 #else // !wxUSE_STD_IOSTREAM
     typedef wxInputStream DocumentIstream;
     typedef wxOutputStream DocumentOstream;
@@ -80,14 +80,14 @@ class DrawingDocument : public wxDocument
 public:
     DrawingDocument() : wxDocument() { }
 
-    DocumentOstream& SaveObject(DocumentOstream& stream) wxOVERRIDE;
-    DocumentIstream& LoadObject(DocumentIstream& stream) wxOVERRIDE;
+    DocumentOstream& SaveObject(DocumentOstream& stream) override;
+    DocumentIstream& LoadObject(DocumentIstream& stream) override;
 
     // add a new segment to the document
     void AddDoodleSegment(const DoodleSegment& segment);
 
     // remove the last segment, if any, and copy it in the provided pointer if
-    // not NULL and return true or return false and do nothing if there are no
+    // not null and return true or return false and do nothing if there are no
     // segments
     bool PopLastSegment(DoodleSegment *segment);
 
@@ -138,8 +138,8 @@ public:
     {
     }
 
-    virtual bool Do() wxOVERRIDE { return DoAdd(); }
-    virtual bool Undo() wxOVERRIDE { return DoRemove(); }
+    virtual bool Do() override { return DoAdd(); }
+    virtual bool Undo() override { return DoRemove(); }
 };
 
 // The command for removing the last segment
@@ -151,48 +151,36 @@ public:
     {
     }
 
-    virtual bool Do() wxOVERRIDE { return DoRemove(); }
-    virtual bool Undo() wxOVERRIDE { return DoAdd(); }
+    virtual bool Do() override { return DoRemove(); }
+    virtual bool Undo() override { return DoAdd(); }
 };
 
 
 // ----------------------------------------------------------------------------
-// wxTextDocument: wxDocument and wxTextCtrl married
+// TextEditDocument: wxDocument implemented using wxTextCtrl
 // ----------------------------------------------------------------------------
 
-class wxTextDocument : public wxDocument
+class TextEditDocument : public wxDocument
 {
 public:
-    wxTextDocument() : wxDocument() { }
+    TextEditDocument() : wxDocument() { }
+    TextEditDocument(const TextEditDocument&) = delete;
+    TextEditDocument &operator=(const TextEditDocument&) = delete;
 
-    virtual bool OnCreate(const wxString& path, long flags) wxOVERRIDE;
+    virtual bool OnCreate(const wxString& path, long flags) override;
 
-    virtual wxTextCtrl* GetTextCtrl() const = 0;
-
-    virtual bool IsModified() const wxOVERRIDE;
-    virtual void Modify(bool mod) wxOVERRIDE;
+    virtual bool IsModified() const override;
+    virtual void Modify(bool mod) override;
 
 protected:
-    virtual bool DoSaveDocument(const wxString& filename) wxOVERRIDE;
-    virtual bool DoOpenDocument(const wxString& filename) wxOVERRIDE;
+    virtual bool DoSaveDocument(const wxString& filename) override;
+    virtual bool DoOpenDocument(const wxString& filename) override;
+
+private:
+    wxTextCtrl* GetTextCtrl() const;
 
     void OnTextChange(wxCommandEvent& event);
 
-    wxDECLARE_NO_COPY_CLASS(wxTextDocument);
-    wxDECLARE_ABSTRACT_CLASS(wxTextDocument);
-};
-
-// ----------------------------------------------------------------------------
-// A very simple text document class
-// ----------------------------------------------------------------------------
-
-class TextEditDocument : public wxTextDocument
-{
-public:
-    TextEditDocument() : wxTextDocument() { }
-    virtual wxTextCtrl* GetTextCtrl() const wxOVERRIDE;
-
-    wxDECLARE_NO_COPY_CLASS(TextEditDocument);
     wxDECLARE_DYNAMIC_CLASS(TextEditDocument);
 };
 
@@ -207,18 +195,19 @@ class ImageDocument : public wxDocument
 {
 public:
     ImageDocument() : wxDocument() { }
+    ImageDocument(const ImageDocument&) = delete;
+    ImageDocument &operator=(const ImageDocument&) = delete;
 
-    virtual bool OnOpenDocument(const wxString& file) wxOVERRIDE;
+    virtual bool OnOpenDocument(const wxString& file) override;
 
     wxImage GetImage() const { return m_image; }
 
 protected:
-    virtual bool DoOpenDocument(const wxString& file) wxOVERRIDE;
+    virtual bool DoOpenDocument(const wxString& file) override;
 
 private:
     wxImage m_image;
 
-    wxDECLARE_NO_COPY_CLASS(ImageDocument);
     wxDECLARE_DYNAMIC_CLASS(ImageDocument);
 };
 
@@ -229,6 +218,8 @@ class ImageDetailsDocument : public wxDocument
 {
 public:
     ImageDetailsDocument(ImageDocument *parent);
+    ImageDetailsDocument(const ImageDetailsDocument&) = delete;
+    ImageDetailsDocument &operator=(const ImageDetailsDocument&) = delete;
 
     // accessors for ImageDetailsView
     wxSize GetSize() const { return m_size; }
@@ -242,8 +233,6 @@ private:
     unsigned long m_numColours;
     wxBitmapType m_type;
     bool m_hasAlpha;
-
-    wxDECLARE_NO_COPY_CLASS(ImageDetailsDocument);
 };
 
 #endif // _WX_SAMPLES_DOCVIEW_DOC_H_

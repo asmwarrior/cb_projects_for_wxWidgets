@@ -60,13 +60,13 @@ enum
 class TimePickerWidgetsPage : public WidgetsPage
 {
 public:
-    TimePickerWidgetsPage(WidgetsBookCtrl *book, wxImageList *imaglist);
+    TimePickerWidgetsPage(WidgetsBookCtrl *book, wxVector<wxBitmapBundle>& imaglist);
 
-    virtual wxWindow *GetWidget() const wxOVERRIDE { return m_timePicker; }
-    virtual void RecreateWidget() wxOVERRIDE { CreateTimePicker(); }
+    virtual wxWindow *GetWidget() const override { return m_timePicker; }
+    virtual void RecreateWidget() override { CreateTimePicker(); }
 
     // lazy creation of the content
-    virtual void CreateContent() wxOVERRIDE;
+    virtual void CreateContent() override;
 
 protected:
     // event handlers
@@ -121,7 +121,7 @@ IMPLEMENT_WIDGETS_PAGE(TimePickerWidgetsPage, "TimePicker",
                        );
 
 TimePickerWidgetsPage::TimePickerWidgetsPage(WidgetsBookCtrl *book,
-                                         wxImageList *imaglist)
+                                         wxVector<wxBitmapBundle>& imaglist)
                      : WidgetsPage(book, imaglist, timepick_xpm)
 {
 }
@@ -148,7 +148,7 @@ void TimePickerWidgetsPage::CreateContent()
                      ),
                      wxSizerFlags().Expand().Border());
 
-    m_textCur->SetMinSize(wxSize(GetTextExtent("  99:99:99  ").x, -1));
+    m_textCur->SetMinSize(m_textCur->GetSizeFromText("00:00:00 AM"));
 
 
     // right pane: control itself
@@ -197,6 +197,8 @@ void TimePickerWidgetsPage::CreateTimePicker()
     m_timePicker = new wxTimePickerCtrl(this, TimePickerPage_Picker, value,
                                         wxDefaultPosition, wxDefaultSize,
                                         style);
+
+    NotifyWidgetRecreation(m_timePicker);
 
     m_sizerTimePicker->Add(0, 0, 1, wxCENTRE);
     m_sizerTimePicker->Add(m_timePicker, 1, wxCENTRE);
