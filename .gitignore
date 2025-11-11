@@ -42,3 +42,9 @@ makefile.wat
 
 # the clangd plugin generated json file
 **/compile_commands.json
+
+# since this is a code::blocks cbp and workspace repo, we should exclude the visual studio project files
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.props
