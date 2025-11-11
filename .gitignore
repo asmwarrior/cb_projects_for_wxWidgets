@@ -34,6 +34,7 @@ makefile.wat
 *.layout
 *_build_log.html
 *.exe
+*.dll
 *.res
 
 # the clangd index files
