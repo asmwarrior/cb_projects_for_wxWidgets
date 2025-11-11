@@ -35,3 +35,6 @@ makefile.wat
 *_build_log.html
 *.exe
 *.res
+
+# the clangd index files
+**/.cache/
