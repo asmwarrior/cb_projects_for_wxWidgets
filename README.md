@@ -19,9 +19,9 @@ You have to set a global variable named "WX_CONFIG" in the Code::Blocks' setting
 The value of the "WX_CONFIG" could be something like below:
 
 If you are using the pre-build wxWidgets library from msys2 project, such as you install the library by the command line `pacman -S mingw-w64-x86_64-wxwidgets3.2-msw`. (See: [Package: mingw-w64-x86_64-wxwidgets3.2-msw - MSYS2 Packages](https://packages.msys2.org/package/mingw-w64-x86_64-wxwidgets3.2-msw?repo=mingw64))
-~~~
+```
 wx-config-msys2.exe --prefix=$(TARGET_COMPILER_DIR)
-~~~
+```
 
 # Building samples projects against the wxWidgets library build yourself
 
